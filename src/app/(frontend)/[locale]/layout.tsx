@@ -4,6 +4,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { Footer } from '@/components/site/footer'
+import { Navbar } from '@/components/site/navbar'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
 
@@ -29,8 +31,14 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale}>
-      <body className="min-h-dvh antialiased">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      <body className="flex min-h-dvh flex-col antialiased">
+        <NextIntlClientProvider>
+          <Navbar />
+          <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">
+            {children}
+          </main>
+          <Footer />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

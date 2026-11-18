@@ -6,7 +6,33 @@
   "Home": {
     "eyebrow": "Coming soon",
     "title": "Software, websites and AI for your business",
-    "body": "Our website is under construction. Content, services and packages will be managed in the CMS.",
-    "switchLanguage": "Deutsch"
+    "body": "Our website is under construction. Content, services and packages will be managed in the CMS."
+  },
+  "Navigation": {
+    "home": "Go to the home page",
+    "label": "Main navigation",
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
+    "skip": "Skip to content",
+    "language": "Language",
+    "newTab": "opens in a new tab"
+  },
+  "Footer": {
+    "email": "Email",
+    "phone": "Phone",
+    "social": "Social media",
+    "legal": "Legal",
+    "newTab": "opens in a new tab"
+  },
+  "Services": {
+    "readMore": "Learn more",
+    "overview": "Services",
+    "breadcrumb": "Breadcrumb",
+    "cta": "Start a project"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "This page does not exist or has not been published yet.",
+    "home": "Back to the home page"
   }
 }

@@ -5,9 +5,14 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+import { sectionLayouts } from './blocks/layouts'
 import { Customers } from './collections/Customers'
 import { Media } from './collections/Media'
+import { Services } from './collections/Services'
 import { Users } from './collections/Users'
+import { Footer } from './globals/Footer'
+import { Navbar } from './globals/Navbar'
+import { PageGlobals } from './globals/pages'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -21,7 +26,11 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Customers, Media],
+  // The order sets the order of the sidebar groups (see ADMIN_GROUPS in src/lib/cms.ts).
+  collections: [Services, Media, Customers, Users],
+  globals: [...PageGlobals, Navbar, Footer],
+  // Section layouts shared by every page (referenced through `blockReferences`).
+  blocks: sectionLayouts,
   localization: {
     locales: [
       { code: 'de', label: 'Deutsch' },
@@ -44,6 +53,9 @@ export default buildConfig({
     },
     // Schema changes go through reviewed migrations only (`pnpm payload migrate:create`).
     push: false,
+    // Page sections are bounded editorial documents. Store them as JSONB instead of
+    // creating block and column tables for every page global.
+    blocksAsJSON: true,
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,

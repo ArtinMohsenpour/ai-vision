@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdmin, isAdminField, isAdminOrSelf } from '@/access'
+import { ADMIN_GROUPS } from '@/lib/cms'
 
 /**
  * Website customer accounts. Customers log in on the website's own pages, never in /admin:
@@ -12,7 +13,7 @@ export const Customers: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'company', 'firstName', 'lastName', 'createdAt', 'suspended'],
-    group: 'Shop',
+    group: ADMIN_GROUPS.shop,
   },
   auth: {
     verify: true,

@@ -4,6 +4,7 @@ Company website: Next.js 16 + Payload 3 + PostgreSQL 18, in German and English. 
 
 - Build plan: [`PLAN.md`](PLAN.md)
 - Rules for developers and AI tools: [`CLAUDE.md`](CLAUDE.md)
+- Editing pages, navigation and footer: [`docs/cms.md`](docs/cms.md)
 
 ## Local setup
 
@@ -12,6 +13,7 @@ cp .env.example .env              # then set a strong POSTGRES_PASSWORD (also in
 pnpm install                      # pnpm 12; downloads Node 26.13.1 for this project
 pnpm db:up                        # PostgreSQL 18 on 127.0.0.1:5437
 pnpm payload migrate              # apply database migrations
+pnpm content:seed                 # bilingual starter content (only fills empty areas)
 pnpm dev
 ```
 

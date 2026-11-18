@@ -13,3 +13,7 @@ export const isAdminOrSelf: Access = ({ req: { user } }) => {
 }
 
 export const anyone: Access = () => true
+
+/** Admin reads everything, including drafts; everyone else reads published content only. */
+export const publishedOrAdmin: Access = ({ req: { user } }) =>
+  user?.collection === 'users' || { _status: { equals: 'published' } }

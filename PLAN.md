@@ -39,21 +39,33 @@ Rules:
 
 ### Globals
 
-| Global          | Fields                                                                                                                                          |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `site-settings` | Company name, logo, contact details, opening hours, social links, Impressum company data, default SEO image, tax note (Kleinunternehmer or VAT) |
-| `navbar`        | Localized links (page picker or external URL), call-to-action button; drafts and versions                                                       |
-| `footer`        | Link columns, legal links, contact block; localized                                                                                             |
-| `home`          | Hero, block layout, SEO fields; drafts and versions                                                                                             |
+Every fixed website page is its own global, with its own editor in the admin sidebar (the Taxful pattern). All page globals share one model: heading (eyebrow, H1, subtitle, up to two buttons), page sections and SEO, with drafts and the last 25 versions. See `docs/cms.md`.
+
+| Global              | Route         | Sidebar group | Fields                                                                                                            |
+| ------------------- | ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `home`              | `/`           | Pages         | Page model                                                                                                        |
+| `services-overview` | `/services`   | Services      | Page model                                                                                                        |
+| `pricing`           | `/pricing`    | Pages         | Page model (packages grid added in phase C)                                                                       |
+| `about`             | `/about`      | Pages         | Page model                                                                                                        |
+| `how-it-works`      | `/how-it-works` | Pages       | Page model                                                                                                        |
+| `faq`               | `/faq`        | Pages         | Page model                                                                                                        |
+| `contact`           | `/contact`    | Pages         | Page model (contact form added with `inquiries` in phase E)                                                       |
+| `impressum`         | `/impressum`  | Legal         | Page model                                                                                                        |
+| `privacy`           | `/privacy`    | Legal         | Page model                                                                                                        |
+| `terms`             | `/terms`      | Legal         | Page model (AGB for business customers)                                                                           |
+| `navbar`            | every page    | Site settings | Logo, items (link or dropdown, text or button), links to a page, a service page, a path or an external URL; drafts and versions |
+| `footer`            | every page    | Site settings | Logo, tagline, contact block, link columns, social profiles, copyright, legal links; drafts and versions          |
+| `site-settings`     | –             | Site settings | Not built yet: company name, opening hours, Impressum company data, default SEO image, tax note                   |
 
 ### Content collections
 
-| Collection     | Fields                                                                                                                                           |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `pages`        | Slug, title, blocks (hero, rich text, image and text, services grid, packages grid, FAQ, call to action, contact form), SEO; drafts and versions |
-| `services`     | Name, slug, summary, icon or image, blocks, related packages, FAQ, SEO                                                                           |
-| `case-studies` | Title, client type, problem, solution, results, images, related service                                                                          |
-| `media`        | File, alt text (localized), caption. Public images only                                                                                          |
+| Collection     | Fields                                                                                                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `services`     | Slug, sort order, title, summary, key points, image, page sections, SEO; drafts and versions. Page at `/services/<slug>`. Related packages in phase C |
+| `case-studies` | Not built yet: title, client type, problem, solution, results, images, related service                                                       |
+| `media`        | File, alt text (localized). Public images only                                                                                               |
+
+Page sections are blocks (full width, two columns, three columns) stored as JSONB (`blocksAsJSON`). Each column holds content items: rich text, image, cards, FAQ, service cards and buttons. Sections are localized per language; English falls back to German.
 
 ### Shop collections
 
@@ -74,7 +86,7 @@ Rules:
 
 ## 4. Access rules
 
-- **Public:** read published pages, globals, services, case studies, active packages and add-ons, and media. Create inquiries (rate-limited).
+- **Public:** read published pages, globals, services, case studies, active packages and add-ons, and media. Never read drafts or version history. Create inquiries (rate-limited).
 - **Customer:**
   - Read and update their own `customers` record, except admin-only fields.
   - Read their own orders, quotes and subscriptions.

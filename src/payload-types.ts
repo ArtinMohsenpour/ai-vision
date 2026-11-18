@@ -7,6 +7,104 @@
  */
 
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentItem".
+ */
+export type ContentItem =
+  | {
+      type: 'text' | 'image' | 'cards' | 'faq' | 'services' | 'buttons';
+      text?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
+      image?: (number | null) | Media;
+      imageFit?: ('natural' | 'landscape' | 'square') | null;
+      caption?: string | null;
+      /**
+       * Short highlights such as benefits or process steps.
+       */
+      cards?:
+        | {
+            title: string;
+            text?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      numbered?: boolean | null;
+      /**
+       * Shown as expandable questions and published as FAQ data for search engines.
+       */
+      faq?:
+        | {
+            question: string;
+            answer: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Choose and drag to order. Leave empty to show all published services in their sort order.
+       */
+      services?: (number | Service)[] | null;
+      buttons?:
+        | {
+            label: string;
+            appearance?: ('primary' | 'secondary') | null;
+            link: {
+              type: 'page' | 'service' | 'path' | 'external';
+              page?:
+                | (
+                    | 'home'
+                    | 'services-overview'
+                    | 'pricing'
+                    | 'about'
+                    | 'how-it-works'
+                    | 'faq'
+                    | 'contact'
+                    | 'impressum'
+                    | 'privacy'
+                    | 'terms'
+                  )
+                | null;
+              service?: (number | null) | Service;
+              /**
+               * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+               */
+              path?: string | null;
+              url?: string | null;
+              newTab?: boolean | null;
+            };
+            id?: string | null;
+          }[]
+        | null;
+      id?: string | null;
+    }[]
+  | null;
+/**
  * Supported timezones in IANA format.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -63,14 +161,19 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
     customers: CustomerAuthOperations;
+    users: UserAuthOperations;
   };
-  blocks: {};
+  blocks: {
+    fullWidth: FullWidthSection;
+    twoColumns: TwoColumnSection;
+    threeColumns: ThreeColumnSection;
+  };
   collections: {
-    users: User;
-    customers: Customer;
+    services: Service;
     media: Media;
+    customers: Customer;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,9 +181,10 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    customers: CustomersSelect<false> | CustomersSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -90,34 +194,42 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('de' | 'en') | ('de' | 'en')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    home: Home;
+    'services-overview': ServicesOverview;
+    pricing: Pricing;
+    about: About;
+    'how-it-works': HowItWork;
+    faq: Faq;
+    contact: Contact;
+    impressum: Impressum;
+    privacy: Privacy;
+    terms: Term;
+    navbar: Navbar;
+    footer: Footer;
+  };
+  globalsSelect: {
+    home: HomeSelect<false> | HomeSelect<true>;
+    'services-overview': ServicesOverviewSelect<false> | ServicesOverviewSelect<true>;
+    pricing: PricingSelect<false> | PricingSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
+    'how-it-works': HowItWorksSelect<false> | HowItWorksSelect<true>;
+    faq: FaqSelect<false> | FaqSelect<true>;
+    contact: ContactSelect<false> | ContactSelect<true>;
+    impressum: ImpressumSelect<false> | ImpressumSelect<true>;
+    privacy: PrivacySelect<false> | PrivacySelect<true>;
+    terms: TermsSelect<false> | TermsSelect<true>;
+    navbar: NavbarSelect<false> | NavbarSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: 'de' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User | Customer;
+  user: Customer | User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
-  };
-}
-export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
-  registerFirstUser: {
-    email: string;
-    password: string;
-  };
-  unlock: {
-    email: string;
-    password: string;
   };
 }
 export interface CustomerAuthOperations {
@@ -138,32 +250,171 @@ export interface CustomerAuthOperations {
     password: string;
   };
 }
+export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "FullWidthSection".
  */
-export interface User {
+export interface FullWidthSection {
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  tone?: ('plain' | 'surface' | 'accent') | null;
+  alignment?: ('top' | 'center') | null;
+  column1?: {
+    content?: ContentItem;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'fullWidth';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
   id: number;
-  name?: string | null;
+  alt: string;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    wide?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Each service has its own page at /services/<slug> and appears in service cards. Translate with the locale selector, save drafts and publish after review.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  /**
+   * Shared by both languages: /de/services/<slug> and /en/services/<slug>. Avoid changing it after publishing.
+   */
+  slug: string;
+  /**
+   * Lower numbers appear first.
+   */
+  sortOrder: number;
+  title: string;
+  /**
+   * Lead paragraph and card text.
+   */
+  summary: string;
+  keyPoints?:
     | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
+        text: string;
+        id?: string | null;
       }[]
     | null;
-  password?: string | null;
-  collection: 'users';
+  /**
+   * Optional image for the service card.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TwoColumnSection".
+ */
+export interface TwoColumnSection {
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  tone?: ('plain' | 'surface' | 'accent') | null;
+  alignment?: ('top' | 'center') | null;
+  column1?: {
+    content?: ContentItem;
+  };
+  column2?: {
+    content?: ContentItem;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'twoColumns';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ThreeColumnSection".
+ */
+export interface ThreeColumnSection {
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  tone?: ('plain' | 'surface' | 'accent') | null;
+  alignment?: ('top' | 'center') | null;
+  column1?: {
+    content?: ContentItem;
+  };
+  column2?: {
+    content?: ContentItem;
+  };
+  column3?: {
+    content?: ContentItem;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'threeColumns';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -213,40 +464,30 @@ export interface Customer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "users".
  */
-export interface Media {
+export interface User {
   id: number;
-  alt: string;
+  name?: string | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    wide?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -273,26 +514,30 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'customers';
-        value: number | Customer;
+        relationTo: 'services';
+        value: number | Service;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'customers';
+        value: number | Customer;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user:
     | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
         relationTo: 'customers';
         value: number | Customer;
+      }
+    | {
+        relationTo: 'users';
+        value: number | User;
       };
   updatedAt: string;
   createdAt: string;
@@ -305,12 +550,12 @@ export interface PayloadPreference {
   id: number;
   user:
     | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
         relationTo: 'customers';
         value: number | Customer;
+      }
+    | {
+        relationTo: 'users';
+        value: number | User;
       };
   key?: string | null;
   value?:
@@ -338,26 +583,73 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "services_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface ServicesSelect<T extends boolean = true> {
+  slug?: T;
+  sortOrder?: T;
+  title?: T;
+  summary?: T;
+  keyPoints?:
     | T
     | {
+        text?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
+      };
+  image?: T;
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        wide?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
 }
 /**
@@ -404,44 +696,26 @@ export interface CustomersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "users_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
     | T
     | {
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        wide?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
       };
 }
 /**
@@ -483,6 +757,1326 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * The page at /de and /en. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/services and /en/services. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-overview".
+ */
+export interface ServicesOverview {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/pricing and /en/pricing. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing".
+ */
+export interface Pricing {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/about and /en/about. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/how-it-works and /en/how-it-works. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "how-it-works".
+ */
+export interface HowItWork {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/faq and /en/faq. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq".
+ */
+export interface Faq {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/contact and /en/contact. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact".
+ */
+export interface Contact {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/impressum and /en/impressum. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "impressum".
+ */
+export interface Impressum {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/privacy and /en/privacy. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy".
+ */
+export interface Privacy {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The page at /de/terms and /en/terms. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terms".
+ */
+export interface Term {
+  id: number;
+  eyebrow?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  actions?:
+    | {
+        label: string;
+        appearance?: ('primary' | 'secondary') | null;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
+   */
+  sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  seo?: {
+    /**
+     * Optional. Falls back to the page title and the site name.
+     */
+    title?: string | null;
+    /**
+     * Optional search-result text (about 120–160 characters). Falls back to the subtitle.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The menu at the top of every page. Drag items to reorder, translate labels with the locale selector, then publish.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navbar".
+ */
+export interface Navbar {
+  id: number;
+  /**
+   * Optional. Replaces the text logo. A transparent PNG or WebP works best. The footer reuses it unless it has its own.
+   */
+  logo?: (number | null) | Media;
+  items?:
+    | {
+        label: string;
+        type: 'link' | 'dropdown';
+        appearance?: ('link' | 'button') | null;
+        link?: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        children?:
+          | {
+              label: string;
+              description?: string | null;
+              link: {
+                type: 'page' | 'service' | 'path' | 'external';
+                page?:
+                  | (
+                      | 'home'
+                      | 'services-overview'
+                      | 'pricing'
+                      | 'about'
+                      | 'how-it-works'
+                      | 'faq'
+                      | 'contact'
+                      | 'impressum'
+                      | 'privacy'
+                      | 'terms'
+                    )
+                  | null;
+                service?: (number | null) | Service;
+                /**
+                 * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+                 */
+                path?: string | null;
+                url?: string | null;
+                newTab?: boolean | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Shown at the bottom of every page. Empty fields and sections are hidden. Translate text with the locale selector, then publish.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  /**
+   * Leave empty to reuse the navigation logo.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * A short sentence under the logo.
+   */
+  tagline?: string | null;
+  /**
+   * Optional. Empty fields are not shown.
+   */
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    /**
+     * Line breaks are kept.
+     */
+    address?: string | null;
+  };
+  /**
+   * Up to four columns, e.g. Services, Company and Customers.
+   */
+  columns?:
+    | {
+        title: string;
+        /**
+         * The /de or /en prefix is added automatically.
+         */
+        links?:
+          | {
+              label: string;
+              link: {
+                type: 'page' | 'service' | 'path' | 'external';
+                page?:
+                  | (
+                      | 'home'
+                      | 'services-overview'
+                      | 'pricing'
+                      | 'about'
+                      | 'how-it-works'
+                      | 'faq'
+                      | 'contact'
+                      | 'impressum'
+                      | 'privacy'
+                      | 'terms'
+                    )
+                  | null;
+                service?: (number | null) | Service;
+                /**
+                 * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+                 */
+                path?: string | null;
+                url?: string | null;
+                newTab?: boolean | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown as icons. Profiles open in a new tab.
+   */
+  social?:
+    | {
+        platform: 'linkedin' | 'xing' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'github' | 'website';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Use {year} for the current year, e.g. © {year} AI Vision.
+   */
+  copyright?: string | null;
+  /**
+   * Impressum, privacy policy and terms. Keep the Impressum reachable from every page.
+   */
+  legalLinks?:
+    | {
+        label: string;
+        link: {
+          type: 'page' | 'service' | 'path' | 'external';
+          page?:
+            | (
+                | 'home'
+                | 'services-overview'
+                | 'pricing'
+                | 'about'
+                | 'how-it-works'
+                | 'faq'
+                | 'contact'
+                | 'impressum'
+                | 'privacy'
+                | 'terms'
+              )
+            | null;
+          service?: (number | null) | Service;
+          /**
+           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
+           */
+          path?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-overview_select".
+ */
+export interface ServicesOverviewSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing_select".
+ */
+export interface PricingSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "how-it-works_select".
+ */
+export interface HowItWorksSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq_select".
+ */
+export interface FaqSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact_select".
+ */
+export interface ContactSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "impressum_select".
+ */
+export interface ImpressumSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy_select".
+ */
+export interface PrivacySelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terms_select".
+ */
+export interface TermsSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  sections?: T | {};
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navbar_select".
+ */
+export interface NavbarSelect<T extends boolean = true> {
+  logo?: T;
+  items?:
+    | T
+    | {
+        label?: T;
+        type?: T;
+        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        children?:
+          | T
+          | {
+              label?: T;
+              description?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    page?: T;
+                    service?: T;
+                    path?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  logo?: T;
+  tagline?: T;
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  columns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    page?: T;
+                    service?: T;
+                    path?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  copyright?: T;
+  legalLinks?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              page?: T;
+              service?: T;
+              path?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

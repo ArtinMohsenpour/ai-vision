@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdmin } from '@/access'
+import { ADMIN_GROUPS } from '@/lib/cms'
 
 /** Public website images only. Stored on the server's disk; never store private files here. */
 export const Media: CollectionConfig = {
   slug: 'media',
   admin: {
-    group: 'Content',
+    group: ADMIN_GROUPS.content,
   },
   access: {
     read: anyone,
