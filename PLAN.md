@@ -39,20 +39,20 @@ Rules:
 
 ### Globals
 
-Every fixed website page is its own global, with its own editor in the admin sidebar (the Taxful pattern). All page globals share one model: heading (eyebrow, H1, subtitle, up to two buttons), page sections and SEO, with drafts and the last 25 versions. See `docs/cms.md`.
+Every fixed website page is its own global, with its own editor in the admin sidebar (the Taxful pattern). All pages, including the service pages collection, sit in one **Pages** sidebar group and share one model: heading (eyebrow, H1, subtitle, up to two buttons; on Home the **Hero** tab, a placeholder until the hero is designed), page sections and SEO, with drafts and the last 25 versions. Pages are cached and refreshed on publish. See `docs/cms.md`.
 
 | Global              | Route         | Sidebar group | Fields                                                                                                            |
 | ------------------- | ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `home`              | `/`           | Pages         | Page model                                                                                                        |
-| `services-overview` | `/services`   | Services      | Page model                                                                                                        |
+| `services-overview` | `/services`   | Pages         | Page model                                                                                                        |
 | `pricing`           | `/pricing`    | Pages         | Page model (packages grid added in phase C)                                                                       |
 | `about`             | `/about`      | Pages         | Page model                                                                                                        |
 | `how-it-works`      | `/how-it-works` | Pages       | Page model                                                                                                        |
 | `faq`               | `/faq`        | Pages         | Page model                                                                                                        |
 | `contact`           | `/contact`    | Pages         | Page model (contact form added with `inquiries` in phase E)                                                       |
-| `impressum`         | `/impressum`  | Legal         | Page model                                                                                                        |
-| `privacy`           | `/privacy`    | Legal         | Page model                                                                                                        |
-| `terms`             | `/terms`      | Legal         | Page model (AGB for business customers)                                                                           |
+| `impressum`         | `/impressum`  | Pages         | Page model                                                                                                        |
+| `privacy`           | `/privacy`    | Pages         | Page model                                                                                                        |
+| `terms`             | `/terms`      | Pages         | Page model (AGB for business customers)                                                                           |
 | `navbar`            | every page    | Site settings | Logo, items (link or dropdown, text or button), links to a page, a service page, a path or an external URL; drafts and versions |
 | `footer`            | every page    | Site settings | Logo, tagline, contact block, link columns, social profiles, copyright, legal links; drafts and versions          |
 | `site-settings`     | –             | Site settings | Not built yet: company name, opening hours, Impressum company data, default SEO image, tax note                   |
@@ -63,7 +63,7 @@ Every fixed website page is its own global, with its own editor in the admin sid
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `services`     | Slug, sort order, title, summary, key points, image, page sections, SEO; drafts and versions. Page at `/services/<slug>`. Related packages in phase C |
 | `case-studies` | Not built yet: title, client type, problem, solution, results, images, related service                                                       |
-| `media`        | File, alt text (localized). Public images only                                                                                               |
+| `media`        | File, alt text (localized). Public images only: PNG/JPEG are converted to WebP on upload (only WebP stored), SVG kept; WebP sizes 400/768/1600 px |
 
 Page sections are blocks (full width, two columns, three columns) stored as JSONB (`blocksAsJSON`). Each column holds content items: rich text, image, cards, FAQ, service cards and buttons. Sections are localized per language; English falls back to German.
 
@@ -80,7 +80,7 @@ Page sections are blocks (full width, two columns, three columns) stored as JSON
 | `subscriptions`    | Customer, Stripe subscription ID, items, status, current period end. Updated only by webhooks                                                                                                                                                                                        |
 | `grants`           | Customer, granted package or add-on or credit, reason, valid until, created by                                                                                                                                                                                                       |
 | `stripe-events`    | Event ID (unique), type, processed at. Hidden from the admin menu                                                                                                                                                                                                                    |
-| `users` (auth)     | Email, password, name. Admin only                                                                                                                                                                                                                                                    |
+| `users` (auth)     | Email, password, first name, last name. Admin only                                                                                                                                                                                                                                                    |
 
 \* Admin-only fields: customers can't read or write them.
 

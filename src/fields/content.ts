@@ -37,6 +37,15 @@ export const websiteEditor = lexicalEditor({
 const when = (...types: string[]) => (_: unknown, sibling: Record<string, unknown> | undefined) =>
   types.includes(sibling?.type as string)
 
+const contentTypes = [
+  { label: 'Rich text', value: 'text' },
+  { label: 'Image', value: 'image' },
+  { label: 'Cards', value: 'cards' },
+  { label: 'FAQ', value: 'faq' },
+  { label: 'Service cards', value: 'services' },
+  { label: 'Buttons', value: 'buttons' },
+]
+
 function contentFields(): Field[] {
   return [
     {
@@ -45,14 +54,7 @@ function contentFields(): Field[] {
       type: 'select',
       required: true,
       defaultValue: 'text',
-      options: [
-        { label: 'Rich text', value: 'text' },
-        { label: 'Image', value: 'image' },
-        { label: 'Cards', value: 'cards' },
-        { label: 'FAQ', value: 'faq' },
-        { label: 'Service cards', value: 'services' },
-        { label: 'Buttons', value: 'buttons' },
-      ],
+      options: contentTypes,
     },
     // The rich text editor is a custom component; the wrapping row hides it in the editor
     // while the inner condition keeps validation for the active type only.
@@ -182,7 +184,14 @@ export function columnField(name: string, label: string): GroupField {
         interfaceName: 'ContentItem',
         maxRows: 12,
         labels: { singular: 'Content item', plural: 'Content items' },
-        admin: { initCollapsed: true },
+        admin: {
+          initCollapsed: true,
+          components: {
+            RowLabel: rowLabel(['type'], 'Content item', {
+              options: Object.fromEntries(contentTypes.map(({ value, label }) => [value, label])),
+            }),
+          },
+        },
         fields: contentFields(),
       },
     ],

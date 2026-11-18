@@ -5,6 +5,7 @@ import { isAdmin, publishedOrAdmin } from '@/access'
 import { linkFields } from '@/fields/link'
 import { rowLabel } from '@/fields/row-label'
 import { protectGlobalDrafts } from '@/hooks/protect-drafts'
+import { revalidateGlobal } from '@/hooks/revalidate'
 import { ADMIN_GROUPS, CMS_VERSION_LIMIT } from '@/lib/cms'
 
 type NavItem = { type?: string; children?: unknown[] | null }
@@ -20,6 +21,7 @@ export const Navbar: GlobalConfig = {
   access: { read: publishedOrAdmin, update: isAdmin, readVersions: isAdmin },
   hooks: {
     beforeOperation: [protectGlobalDrafts],
+    afterChange: [revalidateGlobal],
     beforeValidate: [
       ({ data }) => {
         for (const item of (data?.items ?? []) as NavItem[]) {

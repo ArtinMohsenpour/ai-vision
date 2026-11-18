@@ -37,7 +37,12 @@ describe('website content access', () => {
     })
     admin = await payload.create({
       collection: 'users',
-      data: { email: `content.admin.${stamp}@content.test`, password: `admin-password-${stamp}` },
+      data: {
+        email: `content.admin.${stamp}@content.test`,
+        password: `admin-password-${stamp}`,
+        firstName: 'Test',
+        lastName: 'Admin',
+      },
     })
   })
 

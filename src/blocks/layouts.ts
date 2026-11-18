@@ -1,12 +1,18 @@
 import type { Block, BlocksField } from 'payload'
 
 import { columnField } from '@/fields/content'
+import { rowLabel } from '@/fields/row-label'
 
 function layout(slug: string, label: string, columns: number, interfaceName: string): Block {
   return {
     slug,
     interfaceName,
     labels: { singular: label, plural: label },
+    admin: {
+      // Rows show the section title and layout; the separate block name input is not needed.
+      disableBlockName: true,
+      components: { Label: rowLabel(['title', 'eyebrow'], 'Section', { suffix: label.split(' — ')[0] }) },
+    },
     fields: [
       { name: 'eyebrow', type: 'text', maxLength: 100 },
       { name: 'title', label: 'Section title (H2)', type: 'text', maxLength: 160 },

@@ -29,7 +29,8 @@ Working name only; the company name is not decided yet.
   - Webhooks are signature-checked and processed only once.
   - The redirect back from Stripe never marks anything paid.
 - Content is localized (`de` default, `en`, German fallback). UI strings live in `messages/de.json` and `messages/en.json`.
-- Media is stored on local disk (server volume). Never store private files in `media`.
+- Media is stored on local disk (server volume). Never store private files in `media`. PNG and JPEG uploads are converted to WebP (only WebP is stored); SVG is kept. Render images with `ResponsiveImage`/`MediaImage` (`src/components/site/media-image.tsx`), which use the generated WebP sizes.
+- Public pages are cached (ISR + one `website` cache tag). New collections or globals that the website reads need the `revalidate` hooks from `src/hooks/revalidate.ts`.
 - GraphQL is turned off.
 
 ## Database and generated files

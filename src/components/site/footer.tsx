@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { getLocale, getTranslations } from 'next-intl/server'
 
 import { externalHref } from '@/lib/links'
@@ -7,6 +6,7 @@ import { socialLabel } from '@/lib/social'
 import { loadFooter } from '@/lib/website/load'
 import { SITE_NAME } from '@/lib/website/metadata'
 import { CmsLink } from './cms-link'
+import { isPublicMedia, Logo } from './media-image'
 import { SocialIcon } from './social-icon'
 
 const linkClass = 'text-sm text-muted transition-colors hover:text-foreground'
@@ -23,8 +23,8 @@ export async function Footer() {
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
         <div className="space-y-4">
-          {logo?.url ? (
-            <Image src={logo.url} alt={logo.alt} width={logo.width || 160} height={logo.height || 40} unoptimized className="h-9 w-auto max-w-40 object-contain" />
+          {isPublicMedia(logo) ? (
+            <Logo media={logo} className="h-9 w-auto max-w-40 object-contain" />
           ) : (
             <p className="text-lg font-semibold tracking-tight">{SITE_NAME}</p>
           )}

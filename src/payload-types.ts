@@ -286,11 +286,16 @@ export interface FullWidthSection {
   blockType: 'fullWidth';
 }
 /**
+ * Public website images: PNG, JPEG, WebP or SVG. Photos are converted to WebP and resized automatically. Never upload private documents here.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
+  /**
+   * Describe what the image shows, for screen readers and search engines.
+   */
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -304,6 +309,14 @@ export interface Media {
   focalX?: number | null;
   focalY?: number | null;
   sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
     card?: {
       url?: string | null;
       width?: number | null;
@@ -323,7 +336,7 @@ export interface Media {
   };
 }
 /**
- * Each service has its own page at /services/<slug> and appears in service cards. Translate with the locale selector, save drafts and publish after review.
+ * Each service has its own page at /services/<slug> and appears in service cards. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
@@ -350,7 +363,7 @@ export interface Service {
       }[]
     | null;
   /**
-   * Optional image for the service card.
+   * Optional image next to the heading and on the service card.
    */
   image?: (number | null) | Media;
   /**
@@ -468,7 +481,8 @@ export interface Customer {
  */
 export interface User {
   id: number;
-  name?: string | null;
+  firstName: string;
+  lastName: string;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -630,6 +644,16 @@ export interface MediaSelect<T extends boolean = true> {
   sizes?:
     | T
     | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
         card?:
           | T
           | {
@@ -699,7 +723,8 @@ export interface CustomersSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  name?: T;
+  firstName?: T;
+  lastName?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -759,7 +784,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * The page at /de and /en. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de and /en. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home".
@@ -821,7 +846,7 @@ export interface Home {
   createdAt?: string | null;
 }
 /**
- * The page at /de/services and /en/services. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/services and /en/services. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services-overview".
@@ -883,7 +908,7 @@ export interface ServicesOverview {
   createdAt?: string | null;
 }
 /**
- * The page at /de/pricing and /en/pricing. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/pricing and /en/pricing. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing".
@@ -945,7 +970,7 @@ export interface Pricing {
   createdAt?: string | null;
 }
 /**
- * The page at /de/about and /en/about. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/about and /en/about. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about".
@@ -1007,7 +1032,7 @@ export interface About {
   createdAt?: string | null;
 }
 /**
- * The page at /de/how-it-works and /en/how-it-works. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/how-it-works and /en/how-it-works. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "how-it-works".
@@ -1069,7 +1094,7 @@ export interface HowItWork {
   createdAt?: string | null;
 }
 /**
- * The page at /de/faq and /en/faq. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/faq and /en/faq. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faq".
@@ -1131,7 +1156,7 @@ export interface Faq {
   createdAt?: string | null;
 }
 /**
- * The page at /de/contact and /en/contact. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/contact and /en/contact. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact".
@@ -1193,7 +1218,7 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
- * The page at /de/impressum and /en/impressum. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/impressum and /en/impressum. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "impressum".
@@ -1255,7 +1280,7 @@ export interface Impressum {
   createdAt?: string | null;
 }
 /**
- * The page at /de/privacy and /en/privacy. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/privacy and /en/privacy. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "privacy".
@@ -1317,7 +1342,7 @@ export interface Privacy {
   createdAt?: string | null;
 }
 /**
- * The page at /de/terms and /en/terms. Heading, page sections and SEO. Save a draft while editing, then publish. Translate with the locale selector.
+ * Page at /de/terms and /en/terms. Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "terms".

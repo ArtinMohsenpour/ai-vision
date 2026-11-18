@@ -7,8 +7,6 @@ export const CMS_VERSION_LIMIT = 25
  */
 export const ADMIN_GROUPS = {
   pages: 'Pages',
-  services: 'Services',
-  legal: 'Legal',
   settings: 'Site settings',
   content: 'Media',
   shop: 'Shop',

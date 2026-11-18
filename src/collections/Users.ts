@@ -6,8 +6,10 @@ import { ADMIN_GROUPS } from '@/lib/cms'
 /** Admin accounts. The only collection allowed into /admin (see `admin.user` in payload.config.ts). */
 export const Users: CollectionConfig = {
   slug: 'users',
+  labels: { singular: 'Admin', plural: 'Admins' },
   admin: {
     useAsTitle: 'email',
+    defaultColumns: ['firstName', 'lastName', 'email'],
     group: ADMIN_GROUPS.admin,
   },
   auth: {
@@ -22,8 +24,11 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
-      type: 'text',
+      type: 'row',
+      fields: [
+        { name: 'firstName', type: 'text', required: true, maxLength: 75, admin: { width: '50%' } },
+        { name: 'lastName', type: 'text', required: true, maxLength: 75, admin: { width: '50%' } },
+      ],
     },
   ],
 }

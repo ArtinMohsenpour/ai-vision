@@ -1,0 +1,31 @@
+// Admin tweaks for editing on a phone. Payload's admin is responsive; these make it denser.
+@media (max-width: 768px) {
+  // Dashboard: compact cards so all pages fit on one or two screens.
+  .collections__card-list {
+    gap: 6px;
+
+    .card {
+      min-height: 0;
+      padding: 12px 16px;
+    }
+  }
+
+  .collections__label {
+    margin-bottom: 8px;
+  }
+
+  // Larger touch targets for row actions (reorder, collapse, more).
+  .collapsible__actions .array-actions__button,
+  .collapsible__drag {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  // Prevent iOS from zooming into inputs (it zooms when the font is below 16px).
+  input,
+  textarea,
+  select,
+  .rich-text-lexical .editor {
+    font-size: 16px;
+  }
+}

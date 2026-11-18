@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
 import { buttonClass } from '@/components/site/cms-link'
@@ -14,6 +14,11 @@ import { SITE_NAME, seoMetadata } from '@/lib/website/metadata'
 import { faqJsonLd } from '@/lib/website/structured-data'
 
 type Props = { params: Promise<{ locale: string; slug: string }> }
+
+// Rendered on first visit, then cached until content is published (see the locale layout).
+export function generateStaticParams() {
+  return []
+}
 
 async function serviceFor(params: Props['params']) {
   const { locale, slug } = await params
@@ -35,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServicePage({ params }: Props) {
   const { locale, service } = await serviceFor(params)
+  setRequestLocale(locale)
   if (!service) notFound()
   const [t, services] = await Promise.all([
     getTranslations({ locale, namespace: 'Services' }),
@@ -67,7 +73,7 @@ export default async function ServicePage({ params }: Props) {
             {t('cta')}
           </Link>
         </div>
-        <MediaImage media={service.image} fit="landscape" sizes="(min-width: 1024px) 50vw, 100vw" />
+        <MediaImage media={service.image} fit="landscape" sizes="(min-width: 1024px) 50vw, 100vw" priority />
       </header>
       <Sections sections={service.sections} locale={locale} services={services} />
       <JsonLd data={faqJsonLd(service.sections)} />
