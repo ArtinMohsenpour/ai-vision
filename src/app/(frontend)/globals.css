@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+/* Semantic design tokens. Replace the values when the brand is decided; keep the names. */
+:root {
+  --background: #fbfaf7;
+  --foreground: #1d1f1b;
+  --muted: #62665c;
+  --primary: #2f6f5e;
+  --primary-foreground: #ffffff;
+  --border: #e4e1d8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #141613;
+    --foreground: #f1efe8;
+    --muted: #b3b6ab;
+    --primary: #6fb7a1;
+    --primary-foreground: #0f1a16;
+    --border: #2c302a;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
