@@ -117,6 +117,36 @@ describe('website content access', () => {
     })
   })
 
+  describe('navbar links (rolled back)', () => {
+    const publishNavbar = async (link: Record<string, unknown>) => {
+      const req = await createLocalReq({ user: asAdmin(admin) }, payload)
+      await initTransaction(req)
+      try {
+        return await payload.updateGlobal({
+          slug: 'navbar',
+          data: { items: [{ label: 'Test', type: 'link', link }], _status: 'published' } as never,
+          overrideAccess: false,
+          user: asAdmin(admin),
+          req,
+        })
+      } finally {
+        await killTransaction(req)
+      }
+    }
+
+    it('an internal link needs a page or a service page', async () => {
+      await expect(publishNavbar({ type: 'internal' })).rejects.toThrow()
+      const saved = await publishNavbar({ type: 'internal', page: 'about' })
+      expect(saved.items?.[0]?.link).toMatchObject({ type: 'internal', page: 'about', service: null, url: null })
+    })
+
+    it('an external link needs a valid URL and drops a leftover page', async () => {
+      await expect(publishNavbar({ type: 'external', url: 'javascript:alert(1)' })).rejects.toThrow()
+      const saved = await publishNavbar({ type: 'external', url: 'https://example.com', page: 'about' })
+      expect(saved.items?.[0]?.link).toMatchObject({ type: 'external', url: 'https://example.com', page: null, service: null })
+    })
+  })
+
   describe('service pages', () => {
     it('a visitor and a customer cannot create a service page', async () => {
       await expect(

@@ -1,28 +1,37 @@
 @import 'tailwindcss';
 
-/* Semantic design tokens. Replace the values when the brand is decided; keep the names. */
+/*
+ * Semantic design tokens: light value first, dark value second. Replace the values when the brand
+ * is decided; keep the names. The theme script (src/components/site/theme.tsx) sets
+ * data-theme="light|dark" on <html> before the first paint; without JavaScript the system setting wins.
+ */
 :root {
-  --background: #fbfaf7;
-  --foreground: #1d1f1b;
-  --muted: #62665c;
-  --primary: #2f6f5e;
-  --primary-foreground: #ffffff;
-  --border: #e4e1d8;
-  --surface: #ffffff;
-  --accent: #e7f0ec;
+  color-scheme: light dark;
+  --background: light-dark(#fbfaf8, #0f1110);
+  --foreground: light-dark(#171a16, #eceee9);
+  --muted: light-dark(#5d6259, #a2a79e);
+  --primary: light-dark(#2a6a59, #7cc4ac);
+  --primary-foreground: light-dark(#ffffff, #0b1a14);
+  --border: light-dark(#e4e2db, #272b28);
+  --surface: light-dark(#ffffff, #171a18);
+  --accent: light-dark(#e7f0ec, #1a2924);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141613;
-    --foreground: #f1efe8;
-    --muted: #b3b6ab;
-    --primary: #6fb7a1;
-    --primary-foreground: #0f1a16;
-    --border: #2c302a;
-    --surface: #1b1e1a;
-    --accent: #1f2e29;
-  }
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* `dark:` utilities follow the chosen theme, not only the system setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* Theme switches cross-fade (View Transitions API); skipped for reduced motion. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
 }
 
 @theme inline {

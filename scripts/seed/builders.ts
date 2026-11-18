@@ -1,13 +1,12 @@
 import { richText } from './lexical'
 
 type Link =
-  | { type: 'page'; page: string }
-  | { type: 'service'; service: number }
-  | { type: 'path'; path: string }
+  | { type: 'internal'; page: string }
+  | { type: 'internal'; service: number }
   | { type: 'external'; url: string }
 
-export const page = (slug: string): Link => ({ type: 'page', page: slug })
-export const service = (id: number): Link => ({ type: 'service', service: id })
+export const page = (slug: string): Link => ({ type: 'internal', page: slug })
+export const service = (id: number): Link => ({ type: 'internal', service: id })
 
 type Item = Record<string, unknown> & { type: string }
 type SectionHeading = {

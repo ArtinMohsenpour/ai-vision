@@ -75,7 +75,7 @@ export type ContentItem =
             label: string;
             appearance?: ('primary' | 'secondary') | null;
             link: {
-              type: 'page' | 'service' | 'path' | 'external';
+              type: 'internal' | 'external';
               page?:
                 | (
                     | 'home'
@@ -91,10 +91,6 @@ export type ContentItem =
                   )
                 | null;
               service?: (number | null) | Service;
-              /**
-               * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-               */
-              path?: string | null;
               url?: string | null;
               newTab?: boolean | null;
             };
@@ -344,7 +340,7 @@ export interface Media {
 export interface Service {
   id: number;
   /**
-   * Shared by both languages: /de/services/<slug> and /en/services/<slug>. Avoid changing it after publishing.
+   * Shared by both languages: /services/<slug> and /en/services/<slug>. Avoid changing it after publishing.
    */
   slug: string;
   /**
@@ -784,7 +780,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Page at /de and /en. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at  (German) and /en (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home".
@@ -799,7 +795,7 @@ export interface Home {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -815,10 +811,6 @@ export interface Home {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -846,7 +838,7 @@ export interface Home {
   createdAt?: string | null;
 }
 /**
- * Page at /de/services and /en/services. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /services (German) and /en/services (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services-overview".
@@ -861,7 +853,7 @@ export interface ServicesOverview {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -877,10 +869,6 @@ export interface ServicesOverview {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -908,7 +896,7 @@ export interface ServicesOverview {
   createdAt?: string | null;
 }
 /**
- * Page at /de/pricing and /en/pricing. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /pricing (German) and /en/pricing (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing".
@@ -923,7 +911,7 @@ export interface Pricing {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -939,10 +927,6 @@ export interface Pricing {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -970,7 +954,7 @@ export interface Pricing {
   createdAt?: string | null;
 }
 /**
- * Page at /de/about and /en/about. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /about (German) and /en/about (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about".
@@ -985,7 +969,7 @@ export interface About {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1001,10 +985,6 @@ export interface About {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1032,7 +1012,7 @@ export interface About {
   createdAt?: string | null;
 }
 /**
- * Page at /de/how-it-works and /en/how-it-works. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /how-it-works (German) and /en/how-it-works (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "how-it-works".
@@ -1047,7 +1027,7 @@ export interface HowItWork {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1063,10 +1043,6 @@ export interface HowItWork {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1094,7 +1070,7 @@ export interface HowItWork {
   createdAt?: string | null;
 }
 /**
- * Page at /de/faq and /en/faq. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /faq (German) and /en/faq (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faq".
@@ -1109,7 +1085,7 @@ export interface Faq {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1125,10 +1101,6 @@ export interface Faq {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1156,7 +1128,7 @@ export interface Faq {
   createdAt?: string | null;
 }
 /**
- * Page at /de/contact and /en/contact. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /contact (German) and /en/contact (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact".
@@ -1171,7 +1143,7 @@ export interface Contact {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1187,10 +1159,6 @@ export interface Contact {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1218,7 +1186,7 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
- * Page at /de/impressum and /en/impressum. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /impressum (German) and /en/impressum (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "impressum".
@@ -1233,7 +1201,7 @@ export interface Impressum {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1249,10 +1217,6 @@ export interface Impressum {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1280,7 +1244,7 @@ export interface Impressum {
   createdAt?: string | null;
 }
 /**
- * Page at /de/privacy and /en/privacy. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /privacy (German) and /en/privacy (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "privacy".
@@ -1295,7 +1259,7 @@ export interface Privacy {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1311,10 +1275,6 @@ export interface Privacy {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1342,7 +1302,7 @@ export interface Privacy {
   createdAt?: string | null;
 }
 /**
- * Page at /de/terms and /en/terms. Save a draft while editing, then publish. Switch the language at the top.
+ * Page at /terms (German) and /en/terms (English). Save a draft while editing, then publish. Switch the language at the top.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "terms".
@@ -1357,7 +1317,7 @@ export interface Term {
         label: string;
         appearance?: ('primary' | 'secondary') | null;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1373,10 +1333,6 @@ export interface Term {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1421,7 +1377,7 @@ export interface Navbar {
         type: 'link' | 'dropdown';
         appearance?: ('link' | 'button') | null;
         link?: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1437,10 +1393,6 @@ export interface Navbar {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1449,7 +1401,7 @@ export interface Navbar {
               label: string;
               description?: string | null;
               link: {
-                type: 'page' | 'service' | 'path' | 'external';
+                type: 'internal' | 'external';
                 page?:
                   | (
                       | 'home'
@@ -1465,10 +1417,6 @@ export interface Navbar {
                     )
                   | null;
                 service?: (number | null) | Service;
-                /**
-                 * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-                 */
-                path?: string | null;
                 url?: string | null;
                 newTab?: boolean | null;
               };
@@ -1516,13 +1464,13 @@ export interface Footer {
     | {
         title: string;
         /**
-         * The /de or /en prefix is added automatically.
+         * The /en prefix is added automatically for English.
          */
         links?:
           | {
               label: string;
               link: {
-                type: 'page' | 'service' | 'path' | 'external';
+                type: 'internal' | 'external';
                 page?:
                   | (
                       | 'home'
@@ -1538,10 +1486,6 @@ export interface Footer {
                     )
                   | null;
                 service?: (number | null) | Service;
-                /**
-                 * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-                 */
-                path?: string | null;
                 url?: string | null;
                 newTab?: boolean | null;
               };
@@ -1572,7 +1516,7 @@ export interface Footer {
     | {
         label: string;
         link: {
-          type: 'page' | 'service' | 'path' | 'external';
+          type: 'internal' | 'external';
           page?:
             | (
                 | 'home'
@@ -1588,10 +1532,6 @@ export interface Footer {
               )
             | null;
           service?: (number | null) | Service;
-          /**
-           * For anchors or pages not in the list, e.g. /contact#form. Do not include /de or /en; the language is added automatically.
-           */
-          path?: string | null;
           url?: string | null;
           newTab?: boolean | null;
         };
@@ -1621,7 +1561,6 @@ export interface HomeSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1660,7 +1599,6 @@ export interface ServicesOverviewSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1699,7 +1637,6 @@ export interface PricingSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1738,7 +1675,6 @@ export interface AboutSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1777,7 +1713,6 @@ export interface HowItWorksSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1816,7 +1751,6 @@ export interface FaqSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1855,7 +1789,6 @@ export interface ContactSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1894,7 +1827,6 @@ export interface ImpressumSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1933,7 +1865,6 @@ export interface PrivacySelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -1972,7 +1903,6 @@ export interface TermsSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -2010,7 +1940,6 @@ export interface NavbarSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };
@@ -2025,7 +1954,6 @@ export interface NavbarSelect<T extends boolean = true> {
                     type?: T;
                     page?: T;
                     service?: T;
-                    path?: T;
                     url?: T;
                     newTab?: T;
                   };
@@ -2066,7 +1994,6 @@ export interface FooterSelect<T extends boolean = true> {
                     type?: T;
                     page?: T;
                     service?: T;
-                    path?: T;
                     url?: T;
                     newTab?: T;
                   };
@@ -2092,7 +2019,6 @@ export interface FooterSelect<T extends boolean = true> {
               type?: T;
               page?: T;
               service?: T;
-              path?: T;
               url?: T;
               newTab?: T;
             };

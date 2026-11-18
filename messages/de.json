@@ -15,7 +15,9 @@
     "closeMenu": "Menü schließen",
     "skip": "Zum Inhalt springen",
     "language": "Sprache",
-    "newTab": "öffnet in neuem Tab"
+    "newTab": "öffnet in neuem Tab",
+    "login": "Anmelden",
+    "theme": "Dunkles Design"
   },
   "Footer": {
     "email": "E-Mail",
@@ -34,5 +36,10 @@
     "title": "Seite nicht gefunden",
     "body": "Diese Seite gibt es nicht oder sie ist noch nicht veröffentlicht.",
     "home": "Zur Startseite"
+  },
+  "Login": {
+    "title": "Kundenlogin",
+    "body": "Der Kundenbereich wird gerade aufgebaut. Bald können Sie hier Bestellungen, Angebote und Abos verwalten. Bis dahin erreichen Sie uns über die Kontaktseite.",
+    "contact": "Kontakt aufnehmen"
   }
 }

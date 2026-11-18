@@ -11,6 +11,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  env: {
+    // New for every build: cached CMS data from an older build (maybe before a migration) is never reused.
+    WEBSITE_CACHE_BUILD: Date.now().toString(36),
+  },
   images: {
     localPatterns: [
       {

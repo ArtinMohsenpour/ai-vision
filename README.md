@@ -17,7 +17,7 @@ pnpm content:seed                 # bilingual starter content (only fills empty 
 pnpm dev
 ```
 
-- Website: http://localhost:3000 (redirects to `/de`; English at `/en`)
+- Website: http://localhost:3000 (German; English at `/en`)
 - Admin: http://localhost:3000/admin. The first visit asks you to create the admin account.
 
 Until an email adapter is configured, emails (verification, password reset) are written to the terminal.

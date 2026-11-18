@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { localizedPath } from '@/i18n/routing'
 import { mediaPath } from '@/lib/media-url'
 import type { WebsiteLocale } from '@/lib/pages'
 import type { Media } from '@/payload-types'
@@ -32,7 +33,7 @@ export function seoMetadata({
   locale: WebsiteLocale
 }): Metadata {
   const base = siteOrigin()
-  const href = (language: string) => `${base}/${language}${path === '/' ? '' : path}`
+  const href = (language: string) => `${base}${localizedPath(language, path)}`
   const title = seo?.title?.trim() || fallbackTitle
   const description = seo?.description?.trim() || fallbackDescription?.trim() || undefined
   const media = typeof seo?.image === 'object' ? seo.image : null

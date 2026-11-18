@@ -29,3 +29,63 @@
     font-size: 16px;
   }
 }
+
+/* Link target picker (src/components/admin/link-target-picker.tsx): one color per group. */
+.link-target {
+  --link-page: #2e9d78;
+  --link-service: #7c5cd6;
+
+  .rs__group:nth-child(1) {
+    --link-dot: var(--link-page);
+  }
+  .rs__group:nth-child(2) {
+    --link-dot: var(--link-service);
+  }
+  &--page .rs__single-value {
+    --link-dot: var(--link-page);
+  }
+  &--service .rs__single-value {
+    --link-dot: var(--link-service);
+  }
+
+  .rs__group-heading {
+    color: var(--link-dot);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .rs__group-heading,
+  .rs__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rs__group-heading::before,
+  .rs__option::before,
+  .rs__single-value::before {
+    content: '';
+    flex: none;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--link-dot);
+  }
+
+  /* The chosen page stays on one line; long service names end in "…" on phones. */
+  .value-container,
+  .rs__value-container {
+    flex: 1 1 0%;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+  .rs__single-value::before {
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+  .rs__group-heading::before {
+    border-radius: 2px;
+  }
+}

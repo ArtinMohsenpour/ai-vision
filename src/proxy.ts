@@ -5,7 +5,7 @@ import { routing } from './i18n/routing'
 
 const handleI18nRouting = createMiddleware(routing)
 
-/** Adds the /de or /en prefix to website routes. Payload's /admin and /api are excluded below. */
+/** Language routing: German paths have no prefix, English paths start with /en. Payload's /admin and /api are excluded below. */
 export function proxy(request: NextRequest) {
   return handleI18nRouting(request)
 }

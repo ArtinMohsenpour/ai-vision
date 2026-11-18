@@ -6,6 +6,7 @@ import React from 'react'
 
 import { Footer } from '@/components/site/footer'
 import { Navbar } from '@/components/site/navbar'
+import { ThemeScript } from '@/components/site/theme'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
 
@@ -37,7 +38,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale)
 
   return (
-    <html lang={locale}>
+    // suppressHydrationWarning: the theme script sets data-theme on <html> before React hydrates.
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="flex min-h-dvh flex-col antialiased">
         <NextIntlClientProvider>
           <Navbar />

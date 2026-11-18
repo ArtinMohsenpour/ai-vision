@@ -19,7 +19,7 @@ The admin works at phone width. Dashboard cards are compact, inputs use 16 px te
 
 ## Pages and routes
 
-Each page has its own route folder under `src/app/(frontend)/[locale]/` and its own global with the same model. Paths get the `/de` or `/en` prefix automatically.
+Each page has its own route folder under `src/app/(frontend)/[locale]/` and its own global with the same model. German pages have no language prefix (`/about`); English pages start with `/en` (`/en/about`). The language is never guessed from the browser: `/` is always German. Old `/de/...` URLs redirect to the unprefixed path.
 
 | Page                 | Global              | Path            |
 | -------------------- | ------------------- | --------------- |
@@ -44,7 +44,7 @@ An unpublished page returns 404, except Home, which shows a short placeholder fr
 1. Choose the language with the locale selector. German is the default; English falls back to German.
 2. **Heading**: eyebrow, page title (H1), subtitle and up to two buttons. On Home this tab is called **Hero**: the final hero design is still a placeholder (`src/components/site/hero.tsx`), but it already shows these texts, and the new design will keep using them.
 3. **Content**: add sections and choose **100%**, **50% / 50%** or **33% / 33% / 33%**. Each column holds content items:
-   - **Rich text**: headings H2–H4, lists, quotes, bold, italic, links. Local links like `/about` get the language prefix.
+   - **Rich text**: headings H2–H4, lists, quotes, bold, italic, links. Local links like `/about` get `/en` on English pages.
    - **Image** from the media library, with original, 4:3 or square crop and a caption.
    - **Cards**: short highlights, optionally numbered for process steps.
    - **FAQ**: expandable questions, also published as schema.org `FAQPage` data.
@@ -57,24 +57,26 @@ Sections belong to one language: English sections are separate from German ones.
 
 ## Links
 
-Every link (navbar, footer, buttons) chooses one of:
+Every link (navbar, footer, buttons) is one of two kinds:
 
-- **Website page**: picked from the list of fixed pages.
-- **Service page**: picked from the service pages collection; follows slug changes.
-- **Other path**: a local path such as `/contact#form`, without `/de` or `/en`.
+- **Page on this website**: one picker lists every page, grouped and color-coded: **Website pages** (green, the fixed pages) and **Service pages** (violet, from the collection; unpublished ones are marked "draft"). Service links follow slug changes. The language prefix is added automatically.
 - **External URL**: `https://` or `http://` only.
 
-Unsafe or incomplete links are rejected on save and never rendered (`src/lib/links.ts`).
+Only the destination of the chosen kind is saved. Unsafe or incomplete links are rejected on save and never rendered (`src/lib/links.ts`). The picker: `src/components/admin/link-target-field.tsx` (server, loads the service pages) and `link-target-picker.tsx` (client); colors in `src/app/(payload)/custom.scss`.
 
 ## Navigation and footer
 
-- **Navigation**: optional logo (otherwise the text "AI Vision"), up to eight items. An item is a link (text or call-to-action button) or a dropdown with up to twelve links and short descriptions. The language switcher is added automatically.
+- **Navigation**: optional logo (otherwise the text "AI Vision"), up to eight items. Text links and dropdowns (up to twelve links with short descriptions) sit next to the logo. Items with the **button** appearance appear on the right as call-to-action buttons. The bar always adds, on the right, the DE/EN switch, the light/dark theme switch and the **Log in** button (`/login`, a placeholder page until customer accounts are built). On phones and tablets the links and buttons open in a menu over the page.
 - **Footer**: logo (falls back to the navigation logo), tagline, contact details, up to four link columns, social profiles, copyright (`{year}` becomes the current year) and legal links. Empty parts are hidden.
+
+## Theme
+
+The website has a light and a dark theme. Visitors switch with the sun/moon button in the navigation; the choice is saved in their browser. Without a choice the website follows the device setting. A small script in `<head>` applies the theme before the page is drawn, so cached pages never flash the wrong colors. Colors are defined once in `src/app/(frontend)/globals.css` as tokens with a light and a dark value (`light-dark()`); components use only the tokens (`bg-background`, `text-muted`, `bg-primary`, ...). Code: `src/components/site/theme.tsx`.
 
 ## Speed
 
 - Pages are rendered once on their first visit and then served as cached HTML (ISR), without database queries. Nothing is prerendered at build time, so `pnpm build` needs no database.
-- All CMS reads use one cache tag (`src/lib/website/load.ts`, `src/lib/website/cache.ts`). Publishing or unpublishing a page, service, navbar, footer or image expires it (`src/hooks/revalidate.ts`), so the next visitor gets fresh content. Draft saves do not. Pages also refresh at least once a day.
+- All CMS reads use one cache tag (`src/lib/website/load.ts`, `src/lib/website/cache.ts`). Cache keys include a value that changes with every build, so a deploy never serves data cached by an older build (for example before a migration). Publishing or unpublishing a page, service, navbar, footer or image expires it (`src/hooks/revalidate.ts`), so the next visitor gets fresh content. Draft saves do not. Pages also refresh at least once a day.
 - In `pnpm dev`, pages always render fresh.
 
 ## Images
@@ -112,5 +114,5 @@ Publishes bilingual starter content: six service pages, every page, the navigati
 | Data loading     | `src/lib/website/load.ts` (published only, cached)             |
 | Cache refresh    | `src/hooks/revalidate.ts`                                      |
 | Media            | `src/collections/Media.ts`, `src/lib/media.ts`                 |
-| Components       | `src/components/site/`                                         |
+| Components       | `src/components/site/` (navbar: `navbar.tsx`, `navbar-view.tsx`, `language-switcher.tsx`, `theme.tsx`) |
 | Seed             | `scripts/seed-content.ts`, `scripts/seed/`                     |

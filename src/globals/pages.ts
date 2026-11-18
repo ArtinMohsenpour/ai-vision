@@ -6,6 +6,7 @@ import { pageHeadingFields } from '@/fields/heading'
 import { seoFields } from '@/fields/seo'
 import { protectGlobalDrafts } from '@/hooks/protect-drafts'
 import { revalidateGlobal } from '@/hooks/revalidate'
+import { localizedPath } from '@/i18n/routing'
 import { ADMIN_GROUPS, CMS_VERSION_LIMIT } from '@/lib/cms'
 import { websitePages, type WebsitePageSlug } from '@/lib/pages'
 
@@ -38,7 +39,7 @@ export const PageGlobals: GlobalConfig[] = websitePages.map(({ slug, path, en })
     label: adminLabels[slug] ?? en,
     admin: {
       group: ADMIN_GROUPS.pages,
-      description: `Page at /de${url} and /en${url}. Save a draft while editing, then publish. Switch the language at the top.`,
+      description: `Page at ${url} (German) and ${localizedPath('en', url)} (English). Save a draft while editing, then publish. Switch the language at the top.`,
     },
     access: { read: publishedOrAdmin, update: isAdmin, readVersions: isAdmin },
     hooks: { beforeOperation: [protectGlobalDrafts], afterChange: [revalidateGlobal] },
