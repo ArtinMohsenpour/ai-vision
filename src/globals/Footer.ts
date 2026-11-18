@@ -101,7 +101,7 @@ export const Footer: GlobalConfig = {
               },
               fields: [
                 { name: 'title', type: 'text', required: true, localized: true, maxLength: 60 },
-                linkList('links', 'Links', 12, 'The /de or /en prefix is added automatically.'),
+                linkList('links', 'Links', 12, 'The /en prefix is added automatically for English.'),
               ],
             },
           ],

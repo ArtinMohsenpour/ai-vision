@@ -8,7 +8,7 @@ import { protectCollectionDrafts } from '@/hooks/protect-drafts'
 import { revalidateDeletedDocument, revalidateDocument } from '@/hooks/revalidate'
 import { ADMIN_GROUPS, CMS_VERSION_LIMIT } from '@/lib/cms'
 
-/** One page per service at /de/services/<slug> and /en/services/<slug>. */
+/** One page per service at /services/<slug> (German) and /en/services/<slug> (English). */
 export const Services: CollectionConfig = {
   slug: 'services',
   labels: { singular: 'Service page', plural: 'Service pages' },
@@ -37,7 +37,7 @@ export const Services: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: CMS_VERSION_LIMIT },
   fields: [
     slugField(
-      'Shared by both languages: /de/services/<slug> and /en/services/<slug>. Avoid changing it after publishing.',
+      'Shared by both languages: /services/<slug> and /en/services/<slug>. Avoid changing it after publishing.',
     ),
     {
       name: 'sortOrder',

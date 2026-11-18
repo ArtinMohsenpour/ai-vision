@@ -15,7 +15,9 @@
     "closeMenu": "Close menu",
     "skip": "Skip to content",
     "language": "Language",
-    "newTab": "opens in a new tab"
+    "newTab": "opens in a new tab",
+    "login": "Log in",
+    "theme": "Dark theme"
   },
   "Footer": {
     "email": "Email",
@@ -34,5 +36,10 @@
     "title": "Page not found",
     "body": "This page does not exist or has not been published yet.",
     "home": "Back to the home page"
+  },
+  "Login": {
+    "title": "Customer login",
+    "body": "The customer area is being built. Soon you can manage orders, quotes and subscriptions here. Until then, please reach us through the contact page.",
+    "contact": "Contact us"
   }
 }

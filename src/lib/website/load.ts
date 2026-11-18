@@ -5,7 +5,7 @@ import { cache } from 'react'
 
 import type { Footer, Home, Media, Navbar, Service } from '@/payload-types'
 import type { WebsiteLocale, WebsitePageSlug } from '@/lib/pages'
-import { WEBSITE_CACHE_SECONDS, WEBSITE_CACHE_TAG } from './cache'
+import { WEBSITE_CACHE_BUILD, WEBSITE_CACHE_SECONDS, WEBSITE_CACHE_TAG } from './cache'
 
 /** Every fixed page global has the same fields (see src/globals/pages.ts). */
 export type WebsitePage = Omit<Home, 'id'> & { id: number }
@@ -22,7 +22,7 @@ const publicRead = () => getPayload({ config })
 
 function cached<Args extends unknown[], Result>(key: string, fn: (...args: Args) => Promise<Result>) {
   return cache(
-    unstable_cache(fn, ['website', key], {
+    unstable_cache(fn, ['website', WEBSITE_CACHE_BUILD, key], {
       tags: [WEBSITE_CACHE_TAG],
       revalidate: WEBSITE_CACHE_SECONDS,
     }),

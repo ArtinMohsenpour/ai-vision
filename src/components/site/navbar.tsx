@@ -18,6 +18,8 @@ export async function Navbar() {
         skip: t('skip'),
         language: t('language'),
         newTab: t('newTab'),
+        login: t('login'),
+        theme: t('theme'),
       }}
     />
   )

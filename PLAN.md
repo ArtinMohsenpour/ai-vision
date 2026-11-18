@@ -17,7 +17,7 @@ The public website for a small software and AI studio in Cologne, Germany. It pr
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | App              | Next.js (App Router) + Payload 3 in one app, TypeScript strict, Tailwind CSS                                                        |
 | Database         | PostgreSQL via `@payloadcms/db-postgres`; reviewed migrations, schema push disabled in production                                   |
-| Languages        | Payload localization (`de` default, `en`, German fallback) and next-intl for UI strings; routes `/de/...` and `/en/...`             |
+| Languages        | Payload localization (`de` default, `en`, German fallback) and next-intl for UI strings; German routes without a prefix (`/...`), English under `/en/...`             |
 | Rich text        | Lexical                                                                                                                             |
 | Images           | Payload `media` collection on a server volume (local disk) and Sharp; alt text required and localized                               |
 | Logins           | Payload auth with **two separate auth collections**: `users` (admin only, `admin.user: 'users'`) and `customers` (website accounts) |
@@ -53,7 +53,7 @@ Every fixed website page is its own global, with its own editor in the admin sid
 | `impressum`         | `/impressum`  | Pages         | Page model                                                                                                        |
 | `privacy`           | `/privacy`    | Pages         | Page model                                                                                                        |
 | `terms`             | `/terms`      | Pages         | Page model (AGB for business customers)                                                                           |
-| `navbar`            | every page    | Site settings | Logo, items (link or dropdown, text or button), links to a page, a service page, a path or an external URL; drafts and versions |
+| `navbar`            | every page    | Site settings | Logo, items (link or dropdown, text or button), internal links (one grouped picker: website pages and service pages) or external URLs; drafts and versions |
 | `footer`            | every page    | Site settings | Logo, tagline, contact block, link columns, social profiles, copyright, legal links; drafts and versions          |
 | `site-settings`     | –             | Site settings | Not built yet: company name, opening hours, Impressum company data, default SEO image, tax note                   |
 

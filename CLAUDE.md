@@ -28,9 +28,10 @@ Working name only; the company name is not decided yet.
   - Use hosted Checkout and the Customer Portal; never build a custom checkout or billing screens.
   - Webhooks are signature-checked and processed only once.
   - The redirect back from Stripe never marks anything paid.
-- Content is localized (`de` default, `en`, German fallback). UI strings live in `messages/de.json` and `messages/en.json`.
+- Content is localized (`de` default, `en`, German fallback). German URLs have no prefix (`/about`), English URLs start with `/en`; build links with next-intl's `Link` or `localizedPath()` (`src/i18n/routing.ts`). UI strings live in `messages/de.json` and `messages/en.json`.
 - Media is stored on local disk (server volume). Never store private files in `media`. PNG and JPEG uploads are converted to WebP (only WebP is stored); SVG is kept. Render images with `ResponsiveImage`/`MediaImage` (`src/components/site/media-image.tsx`), which use the generated WebP sizes.
 - Public pages are cached (ISR + one `website` cache tag). New collections or globals that the website reads need the `revalidate` hooks from `src/hooks/revalidate.ts`.
+- The website has a light and a dark theme. Use only the color tokens from `src/app/(frontend)/globals.css` (`bg-background`, `text-muted`, `border-border`, ...), never fixed colors, and check new UI in both themes.
 - GraphQL is turned off.
 
 ## Database and generated files
@@ -48,7 +49,7 @@ Working name only; the company name is not decided yet.
 
 ```bash
 pnpm db:up          # start local PostgreSQL 18 (docker compose, port 5437)
-pnpm dev            # http://localhost:3000 (website /de, /en; admin /admin)
+pnpm dev            # http://localhost:3000 (website: German at /, English at /en; admin /admin)
 pnpm typecheck
 pnpm lint
 pnpm test:int       # access-control tests (needs the database)
