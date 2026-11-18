@@ -4,6 +4,7 @@ import { isAdmin, publishedOrAdmin } from '@/access'
 import { labelledLink, validateExternalURL } from '@/fields/link'
 import { rowLabel } from '@/fields/row-label'
 import { protectGlobalDrafts } from '@/hooks/protect-drafts'
+import { revalidateGlobal } from '@/hooks/revalidate'
 import { ADMIN_GROUPS, CMS_VERSION_LIMIT } from '@/lib/cms'
 import { socialPlatforms } from '@/lib/social'
 
@@ -33,7 +34,7 @@ export const Footer: GlobalConfig = {
       'Shown at the bottom of every page. Empty fields and sections are hidden. Translate text with the locale selector, then publish.',
   },
   access: { read: publishedOrAdmin, update: isAdmin, readVersions: isAdmin },
-  hooks: { beforeOperation: [protectGlobalDrafts] },
+  hooks: { beforeOperation: [protectGlobalDrafts], afterChange: [revalidateGlobal] },
   versions: { drafts: true, max: CMS_VERSION_LIMIT },
   fields: [
     {

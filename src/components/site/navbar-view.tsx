@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 import { Link, usePathname } from '@/i18n/navigation'
@@ -9,6 +8,7 @@ import { SITE_NAME } from '@/lib/website/metadata'
 import type { Navbar } from '@/payload-types'
 import { buttonClass, CmsLink } from './cms-link'
 import { LanguageSwitcher } from './language-switcher'
+import { isPublicMedia, Logo } from './media-image'
 
 type Labels = Record<'home' | 'label' | 'menu' | 'closeMenu' | 'skip' | 'language' | 'newTab', string>
 type Item = NonNullable<Navbar['items']>[number]
@@ -124,15 +124,8 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
       </a>
       <nav aria-label={labels.label} className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 px-4 py-3 sm:px-6">
         <Link href="/" aria-label={labels.home} onClick={close} className="flex min-w-0 items-center rounded-lg">
-          {logo?.url ? (
-            <Image
-              src={logo.url}
-              alt={logo.alt}
-              width={logo.width || 160}
-              height={logo.height || 40}
-              unoptimized
-              className="h-9 w-auto max-w-40 object-contain"
-            />
+          {isPublicMedia(logo) ? (
+            <Logo media={logo} className="h-9 w-auto max-w-40 object-contain" />
           ) : (
             <span className="text-lg font-semibold tracking-tight">{SITE_NAME}</span>
           )}

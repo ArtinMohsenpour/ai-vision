@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { mediaPath } from '@/lib/media-url'
 import type { WebsiteLocale } from '@/lib/pages'
 import type { Media } from '@/payload-types'
 
@@ -34,7 +35,10 @@ export function seoMetadata({
   const href = (language: string) => `${base}/${language}${path === '/' ? '' : path}`
   const title = seo?.title?.trim() || fallbackTitle
   const description = seo?.description?.trim() || fallbackDescription?.trim() || undefined
-  const image = typeof seo?.image === 'object' && seo.image?.url ? seo.image : null
+  const media = typeof seo?.image === 'object' ? seo.image : null
+  // Sharing previews use the 1600 px WebP when it exists (Payload generates it on upload).
+  const imageURL = mediaPath(media?.sizes?.wide?.url) ?? mediaPath(media?.url)
+  const image = media && imageURL ? { url: imageURL, alt: media.alt } : null
   return {
     metadataBase: new URL(base),
     title,
@@ -52,13 +56,13 @@ export function seoMetadata({
       url: href(locale),
       locale: locale === 'de' ? 'de_DE' : 'en_GB',
       alternateLocale: locale === 'de' ? 'en_GB' : 'de_DE',
-      images: image ? [{ url: image.url!, alt: image.alt }] : [],
+      images: image ? [image] : [],
     },
     twitter: {
       card: image ? 'summary_large_image' : 'summary',
       title,
       description,
-      images: image ? [image.url!] : [],
+      images: image ? [image.url] : [],
     },
   }
 }

@@ -14,9 +14,16 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+/**
+ * Pages are rendered on their first visit and then served from the cache (ISR) until content is
+ * published (src/hooks/revalidate.ts) or a day has passed. Nothing is prerendered at build time,
+ * so `next build` needs no database.
+ */
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }))
+  return []
 }
+
+export const revalidate = 86400
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params

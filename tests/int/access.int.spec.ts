@@ -33,7 +33,12 @@ describe('access control', () => {
     customerB = await payload.create({ collection: 'customers', data: customerData('b') })
     admin = await payload.create({
       collection: 'users',
-      data: { email: `admin-${stamp}@example.test`, password: `admin-password-${stamp}` },
+      data: {
+        email: `admin-${stamp}@example.test`,
+        password: `admin-password-${stamp}`,
+        firstName: 'Test',
+        lastName: 'Admin',
+      },
     })
   })
 

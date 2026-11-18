@@ -5,6 +5,7 @@ import { sectionsField } from '@/blocks/layouts'
 import { seoFields } from '@/fields/seo'
 import { slugField } from '@/fields/slug'
 import { protectCollectionDrafts } from '@/hooks/protect-drafts'
+import { revalidateDeletedDocument, revalidateDocument } from '@/hooks/revalidate'
 import { ADMIN_GROUPS, CMS_VERSION_LIMIT } from '@/lib/cms'
 
 /** One page per service at /de/services/<slug> and /en/services/<slug>. */
@@ -15,11 +16,11 @@ export const Services: CollectionConfig = {
   // Links only need the slug; service cards load their own fields.
   defaultPopulate: { slug: true },
   admin: {
-    group: ADMIN_GROUPS.services,
+    group: ADMIN_GROUPS.pages,
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', '_status', 'sortOrder'],
     description:
-      'Each service has its own page at /services/<slug> and appears in service cards. Translate with the locale selector, save drafts and publish after review.',
+      'Each service has its own page at /services/<slug> and appears in service cards. Save a draft while editing, then publish. Switch the language at the top.',
   },
   access: {
     read: publishedOrAdmin,
@@ -28,7 +29,11 @@ export const Services: CollectionConfig = {
     delete: isAdmin,
     readVersions: isAdmin,
   },
-  hooks: { beforeOperation: [protectCollectionDrafts] },
+  hooks: {
+    beforeOperation: [protectCollectionDrafts],
+    afterChange: [revalidateDocument],
+    afterDelete: [revalidateDeletedDocument],
+  },
   versions: { drafts: true, maxPerDoc: CMS_VERSION_LIMIT },
   fields: [
     slugField(
@@ -46,7 +51,7 @@ export const Services: CollectionConfig = {
       type: 'tabs',
       tabs: [
         {
-          label: 'Content',
+          label: 'Heading',
           fields: [
             {
               name: 'title',
@@ -76,11 +81,11 @@ export const Services: CollectionConfig = {
               name: 'image',
               type: 'upload',
               relationTo: 'media',
-              admin: { description: 'Optional image for the service card.' },
+              admin: { description: 'Optional image next to the heading and on the service card.' },
             },
-            sectionsField(),
           ],
         },
+        { label: 'Content', fields: [sectionsField()] },
         { label: 'SEO', fields: seoFields },
       ],
     },
