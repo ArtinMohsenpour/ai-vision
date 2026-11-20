@@ -1,48 +1,27 @@
-import { getPayload } from 'payload'
+import { randomUUID } from 'node:crypto'
+import { BasePayload, type Payload } from 'payload'
+
 import config from '../../src/payload.config.js'
 
-export const testUser = {
-  email: 'dev@payloadcms.com',
-  password: 'test-admin-password-e2e',
-  firstName: 'Test',
-  lastName: 'Admin',
+export async function getLocalTestPayload() {
+  const database = new URL(process.env.DATABASE_URL || 'postgres://invalid')
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(database.hostname)) {
+    throw new Error('The account tests require a local PostgreSQL database.')
+  }
+  return new BasePayload().init({ config })
 }
 
-/**
- * Seeds a test user for e2e admin tests.
- */
-export async function seedTestUser(): Promise<void> {
-  const payload = await getPayload({ config })
-
-  // Delete existing test user if any
-  await payload.delete({
+export async function seedTestUser(payload: Payload) {
+  const suffix = randomUUID()
+  const password = `Temporary admin test password ${suffix}!`
+  const user = await payload.create({
     collection: 'users',
-    where: {
-      email: {
-        equals: testUser.email,
-      },
+    data: {
+      email: `cms-admin-${suffix}@example.test`,
+      password,
+      firstName: 'Test',
+      lastName: 'Admin',
     },
   })
-
-  // Create fresh test user
-  await payload.create({
-    collection: 'users',
-    data: testUser,
-  })
-}
-
-/**
- * Cleans up test user after tests
- */
-export async function cleanupTestUser(): Promise<void> {
-  const payload = await getPayload({ config })
-
-  await payload.delete({
-    collection: 'users',
-    where: {
-      email: {
-        equals: testUser.email,
-      },
-    },
-  })
+  return { id: user.id, email: user.email, password }
 }

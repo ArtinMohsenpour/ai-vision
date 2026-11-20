@@ -1,12 +1,38 @@
-import type { CollectionConfig } from 'payload'
+import { sql } from '@payloadcms/db-postgres'
+import { AuthenticationError, type CollectionConfig, type PayloadRequest } from 'payload'
 
-import { anyone, isAdmin, isAdminField, isAdminOrSelf } from '@/access'
+import { isAdmin, isAdminField, isAdminOrSelf } from '@/access'
 import { ADMIN_GROUPS } from '@/lib/cms'
+import { customerEmail } from '@/lib/customer-auth/email'
+import { verifyCustomerLogin } from '@/lib/customer-auth/mfa'
+import { CUSTOMER_SESSION_SECONDS } from '@/lib/customer-auth/policy'
+import {
+  advanceCredentialEpoch,
+  captureCredentialEpoch,
+  grantCustomerSession,
+  hasCustomerSessionGrant,
+  revokeCustomerSessions,
+} from '@/lib/customer-auth/session-grants'
+import { authDatabase } from '@/lib/customer-auth/transaction'
+import { profileFieldRules } from '@/lib/customer-auth/validation/fields'
+
+const customerRecordAccess: typeof isAdminOrSelf = async (args) => {
+  const { req } = args
+  if (req.payloadAPI !== 'local' && req.user?.collection === 'customers') {
+    if (
+      !('_sid' in req.user) ||
+      typeof req.user._sid !== 'string' ||
+      !(await hasCustomerSessionGrant(req.payload.db.drizzle, req.user.id, req.user._sid))
+    )
+      return false
+  }
+  return isAdminOrSelf(args)
+}
 
 /**
  * Website customer accounts. Customers log in on the website's own pages, never in /admin:
  * payload.config.ts sets `admin.user` to `users`, so a customer session cannot open the admin.
- * Business customers only (§14 BGB): registration requires a company name and confirmation.
+ * Business customers only (§14 BGB): registration requires business confirmation.
  */
 export const Customers: CollectionConfig = {
   slug: 'customers',
@@ -16,26 +42,118 @@ export const Customers: CollectionConfig = {
     group: ADMIN_GROUPS.shop,
   },
   auth: {
-    verify: true,
+    verify: {
+      generateEmailHTML: ({ req, token }) => customerEmail('verify', req, token).html,
+      generateEmailSubject: ({ req }) => customerEmail('verify', req).subject,
+    },
+    forgotPassword: {
+      expiration: 30 * 60 * 1000,
+      minRequestInterval: 60_000,
+      generateEmailHTML: (input) => customerEmail('reset', input?.req, input?.token).html,
+      generateEmailSubject: (input) => customerEmail('reset', input?.req).subject,
+    },
+    useSessions: true,
+    tokenExpiration: CUSTOMER_SESSION_SECONDS,
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
   },
   access: {
-    // Registration from the website; field rules below keep admin-only fields out of reach.
-    create: anyone,
-    read: isAdminOrSelf,
-    update: isAdminOrSelf,
+    create: ({ req }) =>
+      isAdmin({ req }) ||
+      (req.payloadAPI === 'local' && req.context?.customerRegistration === true),
+    read: customerRecordAccess,
+    update: customerRecordAccess,
     delete: isAdmin,
   },
+  // The website actions own customer credentials and their rate limits. Keep CMS CRUD available.
+  endpoints: [
+    '/login',
+    '/logout',
+    '/first-register',
+    '/refresh-token',
+    '/forgot-password',
+    '/reset-password',
+    '/verify/:id',
+  ].map((path) => ({
+    path,
+    method: 'post' as const,
+    handler: () => new Response(null, { status: 404 }),
+  })),
+  hooks: {
+    afterChange: [
+      async ({ context, doc, previousDoc, req, operation }) => {
+        const passwordChanged = context.customerPasswordChanged === true
+        const suspended = doc.suspended && !previousDoc?.suspended
+        if (operation === 'update' && (passwordChanged || suspended)) {
+          const db = authDatabase(req)
+          if (passwordChanged) {
+            await db.execute(sql`
+              UPDATE customers SET reset_password_token = NULL, reset_password_expiration = NULL
+              WHERE id = ${doc.id}
+            `)
+          }
+          await advanceCredentialEpoch(db, doc.id)
+          await revokeCustomerSessions(db, doc.id)
+        }
+        return doc
+      },
+    ],
+    beforeLogin: [
+      async ({ user, req }) => {
+        if (user.suspended) throw new AuthenticationError(req.t)
+        // The email reset uses Payload's reset operation but discards its session before commit.
+        if (req.payloadAPI === 'local' && req.context.customerRecoveryOnly === true) return user
+        await verifyCustomerLogin(req, user.id)
+        return user
+      },
+    ],
+    afterLogin: [
+      async ({ user, req, token }) => {
+        if (req.context.customerRecoveryOnly === true) return user
+        if (req.context.customerWebsiteLogin === true)
+          await grantCustomerSession(req, user.id, token)
+        const afterReauthentication = req.context.customerAfterReauthentication
+        if (req.payloadAPI === 'local' && typeof afterReauthentication === 'function') {
+          await (afterReauthentication as (req: PayloadRequest, token: string) => Promise<void>)(
+            req,
+            token,
+          )
+        }
+        return user
+      },
+    ],
+    beforeOperation: [
+      async ({ args, req, operation, overrideAccess }) => {
+        if (operation === 'login' && typeof args.data.email === 'string')
+          await captureCredentialEpoch(req, args.data.email)
+        if (operation !== 'update' && operation !== 'updateByID') return args
+        // Filter before Payload reads the password, email or internal auth fields for an update.
+        if (!overrideAccess && req.user?.collection === 'customers') {
+          const profile = ['firstName', 'lastName', 'company', 'address', 'vatId', 'phone']
+          if (req.payloadAPI === 'local' && req.context.customerPasswordChange === true)
+            profile.push('password')
+          args.data = Object.fromEntries(
+            Object.entries(args.data).filter(([key]) => profile.includes(key)),
+          )
+        }
+        // Payload removes the plaintext password before calling afterChange.
+        req.context.customerPasswordChanged =
+          typeof args.data.password === 'string' && args.data.password.length > 0
+        return args
+      },
+    ],
+  },
   fields: [
-    { name: 'firstName', type: 'text', required: true, maxLength: 75 },
-    { name: 'lastName', type: 'text', required: true, maxLength: 75 },
+    { name: 'firstName', type: 'text', ...profileFieldRules.firstName },
+    { name: 'lastName', type: 'text', ...profileFieldRules.lastName },
     {
       name: 'company',
       type: 'text',
-      required: true,
-      maxLength: 150,
+      ...profileFieldRules.company,
       label: 'Company or trade name',
+      hooks: {
+        beforeValidate: [({ value }) => (typeof value === 'string' ? value.trim() || null : value)],
+      },
     },
     {
       name: 'address',

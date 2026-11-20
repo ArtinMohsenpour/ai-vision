@@ -433,7 +433,7 @@ export interface Customer {
   id: number;
   firstName: string;
   lastName: string;
-  company: string;
+  company?: string | null;
   address?: {
     street?: string | null;
     postalCode?: string | null;

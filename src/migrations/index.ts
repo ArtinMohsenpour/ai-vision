@@ -7,6 +7,10 @@ import * as migration_20261118_162225_home_hero_artwork from './20261118_162225_
 import * as rheivoHomeContent from './20261118_165720_rheivo_home_content';
 
 import * as dynamicFooterBrand from './20261119_000001_dynamic_footer_brand';
+import * as customerAuthLimits from './20261120_000001_customer_auth_limits';
+import * as optionalCustomerCompany from './20261120_113759_optional_customer_company';
+import * as customerMfa from './20261120_140000_customer_mfa';
+import * as customerSessionGrants from './20261120_140001_customer_session_grants';
 
 export const migrations = [
   {
@@ -43,5 +47,25 @@ export const migrations = [
     up: dynamicFooterBrand.up,
     down: dynamicFooterBrand.down,
     name: '20261119_000001_dynamic_footer_brand',
+  },
+  {
+    up: customerAuthLimits.up,
+    down: customerAuthLimits.down,
+    name: '20261120_000001_customer_auth_limits',
+  },
+  {
+    up: optionalCustomerCompany.up,
+    down: optionalCustomerCompany.down,
+    name: '20261120_113759_optional_customer_company',
+  },
+  {
+    up: customerMfa.up,
+    down: customerMfa.down,
+    name: '20261120_140000_customer_mfa',
+  },
+  {
+    up: customerSessionGrants.up,
+    down: customerSessionGrants.down,
+    name: '20261120_140001_customer_session_grants',
   },
 ];

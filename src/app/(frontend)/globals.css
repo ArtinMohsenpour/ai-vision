@@ -15,6 +15,8 @@
   --border: light-dark(#e4e2db, #272b28);
   --surface: light-dark(#ffffff, #171a18);
   --accent: light-dark(#e7f0ec, #1a2924);
+  --error-text: light-dark(#a12c24, #e77d70);
+  --error-accent: light-dark(#b44237, #d77367);
   --hero-stage: light-dark(#132732, #0d1e27);
   --hero-pearl: #f3faf8;
   --hero-ink: light-dark(#10313b, #f3faf8);

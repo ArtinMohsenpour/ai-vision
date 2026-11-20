@@ -19,6 +19,7 @@ export async function Navbar() {
         language: t('language'),
         newTab: t('newTab'),
         login: t('login'),
+        account: t('account'),
         theme: t('theme'),
       }}
     />

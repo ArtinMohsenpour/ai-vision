@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 
 test.describe('Frontend', () => {
   test('serves the German start page at / and redirects /de there', async ({ page }) => {
-    await page.goto('http://localhost:3000/de')
-    await expect(page).toHaveURL('http://localhost:3000/')
+    await page.goto('/de')
+    await expect(page).toHaveURL('/')
     await expect(page.locator('html')).toHaveAttribute('lang', 'de')
     await expect(page.locator('h1').first()).toHaveText(
       'Rheino — Software, Websites und KI für Ihr Unternehmen',
@@ -11,7 +11,7 @@ test.describe('Frontend', () => {
   })
 
   test('serves the English start page', async ({ page }) => {
-    await page.goto('http://localhost:3000/en')
+    await page.goto('/en')
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     await expect(page.locator('h1').first()).toHaveText(
       'Rheino — Software, websites and AI for your business',
@@ -26,12 +26,12 @@ test.describe('Frontend', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     for (const locale of ['de', 'en']) {
       const prefix = locale === 'de' ? '' : '/en'
-      const response = await request.get('http://localhost:3000/api/services', {
+      const response = await request.get('/api/services', {
         params: { locale, depth: 0, sort: 'sortOrder', limit: 50 },
       })
       expect(response.ok()).toBeTruthy()
       const { docs } = (await response.json()) as { docs: { title: string; slug: string }[] }
-      await page.goto(`http://localhost:3000${prefix}/`)
+      await page.goto(`${prefix}/`)
       const hero = page.locator('[data-home-hero]')
       const links = hero.getByRole('navigation').getByRole('link')
       await expect(links).toHaveText(docs.map(({ title }) => title))
@@ -64,7 +64,7 @@ test.describe('Frontend', () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
-    await page.goto('http://localhost:3000/en')
+    await page.goto('/en')
     const hero = page.locator('[data-home-hero]')
     const video = hero.locator('video')
     const states = () =>
@@ -80,14 +80,14 @@ test.describe('Frontend', () => {
     await expect.poll(states).toContain('running')
     await expect(video).toHaveJSProperty('paused', false)
     await hero.getByRole('link', { name: 'Websites', exact: true }).click()
-    await expect(page).toHaveURL('http://localhost:3000/en/services/websites')
+    await expect(page).toHaveURL('/en/services/websites')
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Websites')
   })
 
   test('plays the rain loop with the matching landscape crop', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await page.setViewportSize({ width: 375, height: 812 })
-    await page.goto('http://localhost:3000/')
+    await page.goto('/')
     const video = page.locator('[data-home-hero] video')
     await expect(video).toHaveAttribute('src', '/hero/rhine-rain-phone.mp4')
     await expect(video).toBeVisible()
@@ -107,7 +107,7 @@ test.describe('Frontend', () => {
   })
 
   test('fits the German service labels on single lines without overlaps', async ({ page }) => {
-    await page.goto('http://localhost:3000/')
+    await page.goto('/')
     const links = page.locator('[data-home-hero] nav a')
     await expect(links.first()).toBeVisible()
     for (const width of [320, 375, 430, 639, 640, 768, 1024, 1440]) {
@@ -143,7 +143,7 @@ test.describe('Frontend', () => {
 
   test('animates each knot only along its connector', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
-    await page.goto('http://localhost:3000/')
+    await page.goto('/')
     const nodes = page.locator('[data-home-hero] li[data-slot]')
     await expect(nodes).toHaveCount(6)
     const knotsOnly = () =>
@@ -168,7 +168,7 @@ test.describe('Frontend', () => {
 
   test('connects the wordmark to the facing edge centers in both languages', async ({ page }) => {
     for (const locale of ['/', '/en']) {
-      await page.goto(`http://localhost:3000${locale}`)
+      await page.goto(`${locale}`)
       const hero = page.locator('[data-home-hero]')
       await expect(hero.locator('li[data-slot]')).toHaveCount(6)
       for (const width of [320, 375, 639, 640, 768, 1024, 1440]) {
@@ -259,18 +259,18 @@ test.describe('Frontend', () => {
   })
 
   test('shows the Rheino logo in the navbar and as the favicon', async ({ page, request }) => {
-    await page.goto('http://localhost:3000/en')
+    await page.goto('/en')
     const home = page.getByRole('banner').getByRole('link', { name: 'Go to the home page' })
     await expect(home.getByRole('img', { name: 'Rheino' })).toBeVisible()
     const icon = await page.locator('link[rel="icon"]').getAttribute('href')
-    const response = await request.get(`http://localhost:3000${icon}`)
+    const response = await request.get(`${icon}`)
     expect(response.headers()['content-type']).toContain('image/svg+xml')
   })
 
   test('lets the navbar fade into the hero until the page scrolls', async ({ page }) => {
     const clear = 'rgba(0, 0, 0, 0)'
     const header = page.locator('[data-site-header]')
-    await page.goto('http://localhost:3000/')
+    await page.goto('/')
     // The landscape starts at the top of the window, behind the clear bar.
     expect((await page.locator('[data-home-hero] img').boundingBox())?.y).toBe(0)
     await expect(header).toHaveCSS('background-color', clear)
@@ -279,7 +279,7 @@ test.describe('Frontend', () => {
     await page.evaluate(() => scrollTo(0, 0))
     await expect(header).toHaveCSS('background-color', clear)
     // Pages without the hero keep the frosted bar.
-    await page.goto('http://localhost:3000/en/services/websites')
+    await page.goto('/en/services/websites')
     await expect(header).not.toHaveCSS('background-color', clear)
   })
 })
