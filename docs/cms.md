@@ -66,7 +66,7 @@ Only the destination of the chosen kind is saved. Unsafe or incomplete links are
 
 ## Navigation and footer
 
-- **Navigation**: optional logo (otherwise the built-in Rheino logo, `src/components/site/brand-logo.tsx`), up to eight items. Text links and dropdowns (up to twelve links with short descriptions) sit next to the logo. Items with the **button** appearance appear on the right as call-to-action buttons. The bar always adds, on the right, the DE/EN switch, the light/dark theme switch and the **Log in** button (`/login`, a placeholder page until customer accounts are built). On phones and tablets the links and buttons open in a menu over the page.
+- **Navigation**: optional logo (otherwise the built-in Rheino logo, `src/components/site/brand-logo.tsx`), up to eight items. Text links and dropdowns (up to twelve links with short descriptions) sit next to the logo. Items with the **button** appearance appear on the right as call-to-action buttons. The bar always adds, on the right, the DE/EN switch, the light/dark theme switch and the **Log in** button (`/login`, the entry point to the customer account). On phones and tablets the links and buttons open in a menu over the page.
 - **Footer**: logo (falls back to the navigation logo, then the built-in Rheino logo), tagline, contact details, up to four link columns, social profiles, copyright (`{year}` becomes the current year) and legal links. Empty parts are hidden.
 
 ## Theme

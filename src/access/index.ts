@@ -8,7 +8,8 @@ export const isAdminField: FieldAccess = ({ req: { user } }) => user?.collection
 /** Admin sees everything; a logged-in customer sees only their own customer record. */
 export const isAdminOrSelf: Access = ({ req: { user } }) => {
   if (user?.collection === 'users') return true
-  if (user?.collection === 'customers') return { id: { equals: user.id } }
+  if (user?.collection === 'customers' && user._verified === true && !user.suspended)
+    return { id: { equals: user.id } }
   return false
 }
 

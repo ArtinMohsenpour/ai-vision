@@ -23,7 +23,7 @@ export function websitePage(slug: string) {
   return websitePages.find((page) => page.slug === slug)
 }
 
-/** Customer login. A placeholder page until customer accounts are built (PLAN.md, phase D). */
+/** Entry point for the website's customer account. */
 export const LOGIN_PATH = '/login'
 
 export const servicePath = (slug: string) => `/services/${slug}`

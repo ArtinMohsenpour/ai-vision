@@ -13,6 +13,7 @@ import { Users } from './collections/Users'
 import { Footer } from './globals/Footer'
 import { Navbar } from './globals/Navbar'
 import { PageGlobals } from './globals/pages'
+import { emailAdapter } from './lib/customer-auth/email'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -44,6 +45,7 @@ export default buildConfig({
     disable: true,
   },
   secret: process.env.PAYLOAD_SECRET || '',
+  email: emailAdapter,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

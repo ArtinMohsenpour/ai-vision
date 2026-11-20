@@ -11,9 +11,19 @@ import { buttonClass, CmsLink } from './cms-link'
 import { LanguageSwitcher } from './language-switcher'
 import { isPublicMedia, Logo } from './media-image'
 import { ThemeToggle } from './theme'
+import { useCustomerSession } from './use-customer-session'
 
 type NavbarLabels = Record<
-  'home' | 'label' | 'menu' | 'closeMenu' | 'skip' | 'language' | 'newTab' | 'login' | 'theme',
+  | 'home'
+  | 'label'
+  | 'menu'
+  | 'closeMenu'
+  | 'skip'
+  | 'language'
+  | 'newTab'
+  | 'login'
+  | 'account'
+  | 'theme',
   string
 >
 type Item = NonNullable<Navbar['items']>[number]
@@ -206,24 +216,27 @@ function NavItems({
   )
 }
 
-/** CMS call-to-action buttons and the customer login. */
+/** CMS call-to-action buttons and the customer account link. */
 function Actions({
   buttons,
   labels,
   variant,
   onNavigate,
+  authenticated,
 }: {
   buttons: Item[]
   labels: NavbarLabels
   variant: Variant
   onNavigate: () => void
+  authenticated: boolean
 }) {
   const size = variant === 'bar' ? 'compact' : 'default'
   const width = variant === 'menu' ? 'w-full' : ''
   return (
     <>
       <Link
-        href={LOGIN_PATH}
+        href={authenticated ? '/account' : LOGIN_PATH}
+        prefetch={false}
         onClick={onNavigate}
         className={`${buttonClass('secondary', size)} ${width} gap-2`}
       >
@@ -238,7 +251,7 @@ function Actions({
           <circle cx="10" cy="6.5" r="3.25" />
           <path d="M3.75 17c.9-3.1 3.3-4.75 6.25-4.75S15.35 13.9 16.25 17" strokeLinecap="round" />
         </svg>
-        {labels.login}
+        {authenticated ? labels.account : labels.login}
       </Link>
       {buttons.map((item) => (
         <CmsLink
@@ -257,6 +270,7 @@ function Actions({
 
 export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: NavbarLabels }) {
   const pathname = usePathname()
+  const authenticated = useCustomerSession(pathname)
   const [open, setOpen] = useState(false)
   const atTop = useSyncExternalStore(subscribeToScroll, atPageTop, () => true)
   const toggle = useRef<HTMLButtonElement>(null)
@@ -322,7 +336,7 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
             <LanguageSwitcher label={labels.language} />
             <ThemeToggle label={labels.theme} />
             <div className="hidden items-center gap-2 pl-1 lg:flex">
-              <Actions buttons={buttons} variant="bar" {...shared} />
+              <Actions buttons={buttons} variant="bar" authenticated={authenticated} {...shared} />
             </div>
             <button
               ref={toggle}
@@ -369,7 +383,12 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
                 <NavItems items={links} variant="menu" {...shared} />
               </ul>
               <div className="border-border mt-4 flex flex-col gap-3 border-t pt-5">
-                <Actions buttons={buttons} variant="menu" {...shared} />
+                <Actions
+                  buttons={buttons}
+                  variant="menu"
+                  authenticated={authenticated}
+                  {...shared}
+                />
               </div>
             </div>
           </div>

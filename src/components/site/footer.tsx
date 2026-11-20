@@ -66,9 +66,9 @@ export async function Footer() {
           )}
         </div>
         {footer?.columns?.length ? (
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-8">
             {footer.columns.map((column) => (
-              <nav key={column.id} aria-label={column.title}>
+              <nav key={column.id} aria-label={column.title} className="min-w-0 wrap-anywhere">
                 <p className="mb-3 text-sm font-semibold">{column.title}</p>
                 <ul className="space-y-2">
                   {column.links?.map((item) => (

@@ -7,7 +7,7 @@ The public website for a small software and AI studio in Cologne, Germany. It pr
 - **Content.** Every text, image, page, the navbar, the footer, every package, add-on and price is editable in the Payload admin, in German (default) and English.
 - **Admin.** One admin (the owner) logs into the Payload admin at `/admin`. They manage content, customers, orders, quotes, inquiries and free grants.
 - **Customers.** Customers have accounts on the website, never in the admin. They can register, verify their email, log in, reset or change their password, edit their profile and company details, order packages, pay, see orders and quotes, accept quotes, and manage subscriptions through Stripe's customer portal.
-- **Customer type.** Business customers only (§14 BGB): freelancers, small companies, shops, restaurants. Registration requires a company or trade name and a confirmation checkbox.
+- **Customer type.** Business customers only (§14 BGB): freelancers, small companies, shops, restaurants. Registration requires business confirmation. The company or trade name is optional at signup.
 - **Pricing model.** Packages have a "from" base price, for example a website from €200. Customers can add add-ons. Custom work goes through an inquiry, then a quote, then payment.
 - **Constraints.** Low cost: no background workers, no external file storage, no custom checkout UI, no custom billing screens.
 
@@ -123,10 +123,17 @@ Rules:
 
 ## 6. Customer account pages (website)
 
+The website uses Payload customer authentication for registration, email verification,
+sign-in, sign-out, and password recovery. The protected portal has Profile and Security pages.
+Customers can update contact and business details, change their password, and set up
+two-step verification with an authenticator app and single-use recovery codes.
+Admin login remains on the separate `users` collection.
+
 - Registration with email verification
 - Login, logout, forgot password, reset password
-- Profile and company details
-- Change password and change email. Both require the current password through a custom route, and email changes are re-verified.
+- Profile and company details. The profile shows the verified sign-in email.
+- Password changes require the current password and, when enabled, a second factor. Password changes end all existing sessions.
+- A future email-change flow will require the current password and verification of the new address.
 - Orders list and detail
 - Quotes with accept and pay
 - Subscriptions with a button to the Stripe Customer Portal
@@ -135,7 +142,7 @@ Rules:
 ## 7. Admin tools (Payload)
 
 - **Customer list:** columns for sign-up date, verified, company, active plan, payment status, suspended.
-- **Send password reset email:** a button that calls Payload's forgot-password operation. Hide the admin's ability to type a customer's password.
+- **Password management:** admins can change a customer's password from their record in Payload. A password change ends customer sessions and invalidates outstanding reset links. A separate email-reset button is planned.
 - **Suspend:** blocks login and ends active sessions.
 - **Grant:** a free plan or bonus until a date. The website gives access if there's a paid subscription **or** an active grant.
 - **"Open in Stripe" links** on customers and orders.
