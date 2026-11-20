@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 
 import { localizedPath, type Locale } from '@/i18n/routing'
 import { submitCustomerAuth } from '@/lib/customer-auth/actions'
+import { safeNextPath } from '@/lib/customer-auth/next-path'
 import type { AuthMode } from '@/lib/customer-auth/policy'
 import { getCustomer } from '@/lib/customer-auth/session'
 import { SITE_NAME } from '@/lib/website/metadata'
@@ -12,7 +13,7 @@ import { CustomerForm } from './customer-form'
 
 export type AuthPageProps = {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; next?: string }>
 }
 
 export async function accountLocale(params: AuthPageProps['params']): Promise<Locale> {
@@ -38,14 +39,16 @@ export async function accountMetadata(
 
 export async function AuthPage({ mode, params, searchParams }: AuthPageProps & { mode: AuthMode }) {
   const locale = await accountLocale(params)
+  const { status, next: nextParam } = await searchParams
+  const next = safeNextPath(nextParam) ?? undefined
   if ((mode === 'login' || mode === 'signup') && (await getCustomer())) {
-    redirect(localizedPath(locale, '/account'))
+    redirect(localizedPath(locale, next ?? '/account'))
   }
-  const { status } = await searchParams
   return (
     <AccountShell>
       <CustomerForm
         mode={mode}
+        next={next}
         action={submitCustomerAuth.bind(null, mode, locale)}
         status={
           status === 'verified'

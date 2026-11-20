@@ -8,11 +8,14 @@ import sharp from 'sharp'
 import { sectionLayouts } from './blocks/layouts'
 import { Customers } from './collections/Customers'
 import { Media } from './collections/Media'
+import { Orders } from './collections/Orders'
 import { Services } from './collections/Services'
+import { StripeEvents } from './collections/StripeEvents'
 import { Users } from './collections/Users'
 import { Footer } from './globals/Footer'
 import { Navbar } from './globals/Navbar'
 import { PageGlobals } from './globals/pages'
+import { ShopSettings } from './globals/ShopSettings'
 import { emailAdapter } from './lib/customer-auth/email'
 
 const filename = fileURLToPath(import.meta.url)
@@ -28,8 +31,8 @@ export default buildConfig({
     },
   },
   // The order sets the order of the sidebar groups (see ADMIN_GROUPS in src/lib/cms.ts).
-  collections: [Services, Media, Customers, Users],
-  globals: [...PageGlobals, Navbar, Footer],
+  collections: [Services, Media, Customers, Orders, Users, StripeEvents],
+  globals: [...PageGlobals, Navbar, Footer, ShopSettings],
   // Section layouts shared by every page (referenced through `blockReferences`).
   blocks: sectionLayouts,
   localization: {

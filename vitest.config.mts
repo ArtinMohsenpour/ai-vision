@@ -8,5 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['tests/int/**/*.int.spec.ts'],
+    // The tests share one database (and its single shop-settings global), so files run one at a time.
+    fileParallelism: false,
   },
 })

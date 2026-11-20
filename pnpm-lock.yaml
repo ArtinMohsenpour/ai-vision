@@ -214,6 +214,9 @@ importers:
       sharp:
         specifier: 0.35.4
         version: 0.35.4(@types/node@26.6.6)
+      stripe:
+        specifier: 23.1.0
+        version: 23.1.0(@types/node@26.6.6)
     devDependencies:
       '@playwright/test':
         specifier: 1.63.0
@@ -4830,6 +4833,15 @@ packages:
   strip-json-comments@5.1.0:
     resolution: {integrity: sha512-ErcwpJBYr8EfX/Br7JauOIGXoRE92w0hVtuS9j92UFgbATxA+WRSIZksSUDzEeItfWB/0QCEprTZT55RSINUHQ==}
     engines: {node: '>=22'}
+
+  stripe@23.1.0:
+    resolution: {integrity: sha512-fVUfMSfTPoukfoV//MUKAx2+YxyKmYaYtnAL9VkfnHfaPNQylFdWZMD+zgUFerI8rjbaiER8Vzj2XEUQ2AhAsQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@types/node': '>=20'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strtok3@10.8.0:
     resolution: {integrity: sha512-e6bW3fD6V01DPmcbLfNtn0cjsiHvTKS/hivgbzqYMfHb/nLes4QQ0H5QBxlkPQayF4xv08AvlSgptGwN86Eemw==}
@@ -9899,6 +9911,10 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-json-comments@5.1.0: {}
+
+  stripe@23.1.0(@types/node@26.6.6):
+    optionalDependencies:
+      '@types/node': 26.6.6
 
   strtok3@10.8.0:
     dependencies:

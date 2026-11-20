@@ -25,6 +25,11 @@ const test = base.extend<{ trackCustomer: (email: string) => string }>({
       if (emails.length) {
         const payload = await getLocalTestPayload()
         try {
+          // Customers with orders cannot be deleted; remove test orders first.
+          await payload.delete({
+            collection: 'orders',
+            where: { 'customer.email': { in: emails } },
+          })
           const result = await payload.delete({
             collection: 'customers',
             where: { email: { in: emails } },

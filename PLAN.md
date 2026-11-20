@@ -45,7 +45,7 @@ Every fixed website page is its own global, with its own editor in the admin sid
 | ------------------- | ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `home`              | `/`           | Pages         | Page model                                                                                                        |
 | `services-overview` | `/services`   | Pages         | Page model                                                                                                        |
-| `pricing`           | `/pricing`    | Pages         | Page model (packages grid added in phase C)                                                                       |
+| `pricing`           | `/pricing`    | Pages         | Page model; the price grid of orderable and quote services is rendered between heading and sections               |
 | `about`             | `/about`      | Pages         | Page model                                                                                                        |
 | `how-it-works`      | `/how-it-works` | Pages       | Page model                                                                                                        |
 | `faq`               | `/faq`        | Pages         | Page model                                                                                                        |
@@ -55,13 +55,14 @@ Every fixed website page is its own global, with its own editor in the admin sid
 | `terms`             | `/terms`      | Pages         | Page model (AGB for business customers)                                                                           |
 | `navbar`            | every page    | Site settings | Logo, items (link or dropdown, text or button), internal links (one grouped picker: website pages and service pages) or external URLs; drafts and versions |
 | `footer`            | every page    | Site settings | Logo, tagline, contact block, link columns, social profiles, copyright, legal links; drafts and versions          |
-| `site-settings`     | –             | Site settings | Not built yet: company name, opening hours, Impressum company data, default SEO image, tax note                   |
+| `shop-settings`     | –             | Shop          | Ordering open/closed, VAT (0 % §19 UStG or 19 %, same for every customer), price note, order notification email (admin-only) |
+| `site-settings`     | –             | Site settings | Not built yet: company name, opening hours, Impressum company data, default SEO image                             |
 
 ### Content collections
 
 | Collection     | Fields                                                                                                                                       |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `services`     | Slug, sort order, title, summary, key points, image, page sections, SEO; drafts and versions. Page at `/services/<slug>`. Related packages in phase C |
+| `services`     | Slug, sort order, title, summary, key points, image, page sections, SEO; drafts and versions. Page at `/services/<slug>`. **Ordering** tab: mode (`off` · `order` · `quote`), base package (name, description, includes, price in cents, delivery days), deposit %, extras (title, summary, price, extra days, active, preview: description, "what you get", image or icon) |
 | `case-studies` | Not built yet: title, client type, problem, solution, results, images, related service                                                       |
 | `media`        | File, alt text (localized). Public images only: PNG/JPEG are converted to WebP on upload (only WebP stored), SVG kept; WebP sizes 400/768/1600 px |
 
@@ -71,10 +72,8 @@ Page sections are blocks (full width, two columns, three columns) stored as JSON
 
 | Collection         | Fields                                                                                                                                                                                                                                                                               |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages`         | Name, slug, service, short text, features, base price (cents), "from" flag, billing (`one_off` · `monthly`), deposit % (optional), delivery time, allowed add-ons, button type (`order` · `quote`), active, sort order                                                               |
-| `addons`           | Name, description, price (cents), billing (`one_off` · `monthly`), quantity min/max (optional), active                                                                                                                                                                               |
 | `customers` (auth) | Email, password, first name, last name, company or trade name, address, VAT ID (optional), phone, `businessConfirmedAt`, `stripeCustomerId`_, `suspended`_, `adminNotes`*                                                                                                            |
-| `orders`           | Number, customer, snapshot of package, add-ons, quantities and prices at order time, totals, deposit, status (`pending_payment` · `paid` · `in_progress` · `delivered` · `completed` · `cancelled` · `refunded`), Stripe session ID and payment intent ID, admin notes*; versions on |
+| `orders`           | Number (`R-<year>-<id>`), customer, locale, snapshot (service, base, extras, prices, VAT, total, deposit, delivery days), payment status (`unpaid` · `deposit_paid` · `paid` · `refunded` · `partially_refunded`, derived from payments), work status (`awaiting_payment` · `new` · `in_progress` · `delivered` · `completed` · `cancelled`), Stripe payments (session, payment intent, amount, refunds), payments outside Stripe, balance request, billing details from Stripe, terms accepted at, admin notes*; versions on |
 | `inquiries`        | Name, email, company, service, budget range, message, customer (optional), status (`new` · `contacted` · `quoted` · `closed`)                                                                                                                                                        |
 | `quotes`           | Number, customer, inquiry, line items, total, deposit %, valid until, status (`draft` · `sent` · `accepted` · `paid` · `expired`)                                                                                                                                                    |
 | `subscriptions`    | Customer, Stripe subscription ID, items, status, current period end. Updated only by webhooks                                                                                                                                                                                        |
@@ -86,7 +85,7 @@ Page sections are blocks (full width, two columns, three columns) stored as JSON
 
 ## 4. Access rules
 
-- **Public:** read published pages, globals, services, case studies, active packages and add-ons, and media. Never read drafts or version history. Create inquiries (rate-limited).
+- **Public:** read published pages, globals, services (including their ordering prices), case studies, shop settings (except the notification email), and media. Never read drafts or version history. Create inquiries (rate-limited).
 - **Customer:**
   - Read and update their own `customers` record, except admin-only fields.
   - Read their own orders, quotes and subscriptions.
@@ -99,20 +98,19 @@ Page sections are blocks (full width, two columns, three columns) stored as JSON
 
 ## 5. Order and payment flow
 
-1. **Package page.** Shows the base price and selectable add-ons from Payload. The running total in the browser is for display only.
-2. **Order.** The customer must be logged in, with verified email, company details and business confirmation.
-3. **Server.** Receives only IDs and quantities, reloads the prices from Payload, then calculates the totals in cents.
-4. **Order record.** Created with a full price snapshot and status `pending_payment`.
-5. **Stripe Checkout session.**
-   - One-off items only: `payment` mode.
-   - Any monthly item: `subscription` mode, with one-off items charged on the first invoice.
-   - Deposit: charge only the deposit amount.
-6. **Webhook `checkout.session.completed`.**
-   - Verify the signature.
-   - Skip events already in `stripe-events`.
-   - Mark the order `paid` and store the subscription.
-   - Email the customer and the admin.
-7. **Subscription webhooks** keep `subscriptions` in sync. Customers manage cards and cancellations in the Stripe Customer Portal.
+Round 1 (built, see `docs/shop.md`; tested against Stripe test mode on 2026-11-20: full payment, deposit plus balance and expired session; refunds only with simulated events because the sandbox account cannot refund yet): one-off payments and deposits. Round 2: monthly items.
+
+1. **Order page** (`/services/<slug>/order`). Shows the base package and the active extras with a preview. The running total in the browser is for display only. The selection lives in the URL.
+2. **Order.** The customer must be logged in with a verified email (business confirmation happens at signup) and accept the AGB. Logged-out customers return to the same selection after login, signup and email verification. Billing name, address and VAT ID are collected on Stripe's page.
+3. **Server.** Receives only the service, extra IDs and the terms checkbox, reloads the published prices from Payload (never the website cache), then calculates the totals in cents. VAT is rounded per line and sent to Stripe as its own line, so Stripe charges exactly our total.
+4. **Order record.** Created with a full price snapshot and work status `awaiting_payment`.
+5. **Stripe Checkout session** in `payment` mode, expiring after 1 hour. Deposit: only the deposit (plus its VAT). The rest is requested by the admin later ("Request remaining balance") and paid from the customer account, or recorded as a bank transfer.
+6. **Webhooks** (`checkout.session.completed` · `async_payment_succeeded` · `async_payment_failed` · `expired`, `charge.refunded`).
+   - Verify the signature on the raw body; reject live events before launch.
+   - Record the event in `stripe-events` and update the order in one transaction; a repeated event ID is skipped.
+   - The session must belong to the order; metadata alone never selects an order.
+   - Email the customer and the admin after the commit.
+7. **Round 2: subscription webhooks** keep `subscriptions` in sync. Customers manage cards and cancellations in the Stripe Customer Portal.
 8. **Custom work:** inquiry form → the admin writes a quote in Payload → the customer accepts it in their account → steps 3–6.
 
 Rules:
@@ -127,6 +125,8 @@ The website uses Payload customer authentication for registration, email verific
 sign-in, sign-out, and password recovery. The protected portal has Profile and Security pages.
 Customers can update contact and business details, change their password, and set up
 two-step verification with an authenticator app and single-use recovery codes.
+Authenticator secrets and recovery codes depend on `PAYLOAD_SECRET`: changing or losing it breaks
+every customer's two-step verification, so back it up together with the database.
 Admin login remains on the separate `users` collection.
 
 - Registration with email verification
@@ -168,9 +168,9 @@ Each service page includes the problem, the solution, packages with prices, the 
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----- |
 | A. Foundations               | Repo, Next.js + Payload + PostgreSQL, Docker Compose, Caddy with admin IP restriction, CI deploy, migration workflow, localization, Brevo SMTP (SPF/DKIM/DMARC), staging behind basic auth          | Staging is deployed via CI; the admin is reachable only from the allowed network | ~20   |
 | B. Content and page builder  | Globals, `pages` blocks, `services`, `case-studies`, `media`, SEO fields, sitemap and hreflang, design system, frontend rendering for every block                                                   | Every public page is fully editable in both languages                            | ~40   |
-| C. Packages and configurator | `packages`, `addons`, package pages, add-on picker, server-side price calculation, tests                                                                                                            | Totals are calculated only on the server; tests pass                             | ~25   |
+| C. Packages and configurator | Built (round 1): Ordering tab on services, shop settings, price grid, order page with preview, server-side price calculation, tests                                                                 | Totals are calculated only on the server; tests pass                             | ~25   |
 | D. Customer accounts         | `customers` auth collection, registration, verification, login, reset, profile, business confirmation, account pages, access tests                                                                  | A customer can't reach `/admin` or other customers' data; tests pass             | ~25   |
-| E. Orders and payments       | `orders` with snapshots, Checkout in all three modes, idempotent webhooks, Customer Portal, inquiries, quotes, grants, emails, Stripe CLI tests                                                     | A full purchase works in Stripe test mode, including subscription and deposit    | ~35   |
+| E. Orders and payments       | Round 1 built and tested in Stripe test mode: `orders` with snapshots, one-off and deposit Checkout, balance requests, idempotent webhooks, emails, account orders. Round 2: subscriptions, Customer Portal, inquiries, quotes, grants | A full purchase works in Stripe test mode, including subscription and deposit    | ~35   |
 | F. Admin tools               | Customer list columns, reset-email button, suspend, Stripe links, dashboard                                                                                                                         | The admin can do every task in section 7                                         | ~12   |
 | G. Hardening                 | Security headers, rate limits on login and forms, backups of the database and media with a tested restore, uptime monitoring, accessibility (WCAG 2.2 AA) and performance checks, draft legal texts | Restore test passed; Lighthouse ≥ 90                                             | ~20   |
 | H. Launch                    | After the business registration: Stripe live keys, final legal texts, remove basic auth, Search Console, Google Business Profile                                                                    | The site is public and taking payments                                           | ~8    |
@@ -182,7 +182,7 @@ Later, optional: live preview in the admin, an AI chat assistant on the site (EU
 - A custom checkout or billing management UI
 - External object storage
 - A second auth library
-- Two-factor login for customers
+- Two-factor methods beyond the optional authenticator app and recovery codes (no SMS, email codes or passkeys)
 - Background workers or queues
 - File uploads from customers
 - An invoice engine (use an invoicing tool)

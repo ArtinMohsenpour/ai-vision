@@ -4,6 +4,7 @@ const iconPaths = {
   verified: 'm6 12 4 4 8-8',
   arrow: 'm9 6 6 6-6 6',
   logout: 'M10 17l5-5-5-5m5 5H3m10-8h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5',
+  orders: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3',
   password: 'M7 11V8a5 5 0 0 1 10 0v3m-11 0h12a2 2 0 0 1 2 2v7H4v-7a2 2 0 0 1 2-2Zm6 4v2',
 } as const
 

@@ -27,6 +27,8 @@ type Props = {
   mode: AuthMode
   action: (state: FormState, form: FormData) => Promise<FormState>
   status?: 'verified' | 'resetDone' | 'invalidLink'
+  /** A validated site path to continue to after login, e.g. an order page. */
+  next?: string
 }
 
 const subscribeToHash = (listener: () => void) => {
@@ -65,8 +67,12 @@ function CustomerFormContent({
   mode,
   action,
   status,
+  next,
   fragment,
 }: Props & { fragment: string | null }) {
+  // Keep the "continue to" path when switching between login and signup.
+  const keepNext = (pathname: '/login' | '/signup') =>
+    next ? { pathname, query: { next } } : pathname
   const t = useTranslations('CustomerAuth')
   const locale = useLocale()
   const [state, formAction, pending] = useActionState(action, {})
@@ -234,10 +240,10 @@ function CustomerFormContent({
     <>
       {((mode === 'login' && !needsFactor) || signup) && (
         <nav className={styles.switcher}>
-          <Link aria-current={mode === 'login' ? 'page' : undefined} href="/login">
+          <Link aria-current={mode === 'login' ? 'page' : undefined} href={keepNext('/login')}>
             {t('signIn')}
           </Link>
-          <Link aria-current={signup ? 'page' : undefined} href="/signup">
+          <Link aria-current={signup ? 'page' : undefined} href={keepNext('/signup')}>
             {t('signUp')}
           </Link>
         </nav>
@@ -264,6 +270,7 @@ function CustomerFormContent({
       {!invalidReset && !waitingForLink && (
         <form action={formAction} ref={form} onSubmit={submit} noValidate aria-busy={pending}>
           <fieldset className={styles.fields} disabled={pending}>
+            {next && <input name="next" type="hidden" value={next} />}
             {(reset || mode === 'verify-email') && (
               <input name="token" type="hidden" value={token} />
             )}
@@ -367,11 +374,11 @@ function CustomerFormContent({
         </p>
       ) : mode === 'login' ? (
         <p className={styles.bottom}>
-          {t('newHere')} <Link href="/signup">{t('signUp')}</Link>
+          {t('newHere')} <Link href={keepNext('/signup')}>{t('signUp')}</Link>
         </p>
       ) : mode === 'signup' ? (
         <p className={styles.bottom}>
-          {t('alreadyRegistered')} <Link href="/login">{t('signIn')}</Link>
+          {t('alreadyRegistered')} <Link href={keepNext('/login')}>{t('signIn')}</Link>
         </p>
       ) : (
         <p className={styles.bottom}>

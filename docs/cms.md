@@ -8,10 +8,10 @@ Every public page, the navigation and the footer are edited in Payload at `/admi
 | ------------- | --------------------------------------------------------------------------------------------------------------- |
 | Pages         | Service pages (collection), Home, Services overview, Packages & pricing, About us, How we work, FAQ, Contact, Legal notice (Impressum), Privacy policy, Terms and conditions (AGB) |
 | Media         | Media library                                                                                                   |
-| Shop, Admin   | Customers, admins                                                                                               |
+| Shop, Admin   | Customers, orders, shop settings (see `docs/shop.md`), admins                                                   |
 | Site settings | Navigation, Footer                                                                                              |
 
-Groups are defined in `ADMIN_GROUPS` (`src/lib/cms.ts`). Payload lists groups that contain collections first, so the order of `collections` in `src/payload.config.ts` sets the order. Every page, including service pages, has the same tabs: **Heading** (Home: **Hero**), **Content** and **SEO**.
+Groups are defined in `ADMIN_GROUPS` (`src/lib/cms.ts`). Payload lists groups that contain collections first, so the order of `collections` in `src/payload.config.ts` sets the order. Every page, including service pages, has the same tabs: **Heading** (Home: **Hero**), **Content** and **SEO**. Service pages also have an **Ordering** tab for prices and extras (`docs/shop.md`).
 
 ## Editing on a phone
 

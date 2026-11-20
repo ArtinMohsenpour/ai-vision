@@ -132,6 +132,24 @@ describe('access control', () => {
     expect(requests.filter(Boolean)).toHaveLength(4)
   })
 
+  it('does not let one blocked client use up the site-wide login limit', async () => {
+    const previous = process.env.CUSTOMER_AUTH_IP_HEADER
+    process.env.CUSTOMER_AUTH_IP_HEADER = 'x-test-client-ip'
+    const from = (ip: string) => new Headers({ 'x-test-client-ip': ip })
+    const attacker = `2001:db8:a::${(stamp % 0xffff).toString(16)}`
+    const customer = `2001:db8:b::${(stamp % 0xffff).toString(16)}`
+    try {
+      const attempts: boolean[] = []
+      for (let i = 0; i < 160; i++)
+        attempts.push(await allowAuthRequest(payload, 'login', from(attacker)))
+      expect(attempts.filter(Boolean).length).toBeLessThanOrEqual(15)
+      expect(await allowAuthRequest(payload, 'login', from(customer))).toBe(true)
+    } finally {
+      if (previous === undefined) delete process.env.CUSTOMER_AUTH_IP_HEADER
+      else process.env.CUSTOMER_AUTH_IP_HEADER = previous
+    }
+  })
+
   it('revokes a suspended customer session and rejects subsequent login', async () => {
     const data = customerData('b')
     const credentials = { email: data.email, password: data.password }

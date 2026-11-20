@@ -21,6 +21,7 @@ import { customerEmail, customerMailAvailable, verificationToken } from './email
 import { secondFactorError } from './mfa'
 import { authModes, type AuthMessage, type AuthMode, type FormState } from './policy'
 import { allowAuthRequest } from './rate-limit'
+import { safeNextPath } from './next-path'
 import { customerRequest } from './request'
 import { clearCustomerSession, setCustomerSession } from './session'
 import { advanceCredentialEpoch, revokeCustomerSessions } from './session-grants'
@@ -89,6 +90,8 @@ export async function submitCustomerAuth(
   const problem = (message: AuthMessage): FormState => ({ message, values })
   const sent = (message: AuthMessage): FormState => ({ message, sent: true })
   const password = inputs.password ?? ''
+  // Where to continue after login or verification, e.g. back to an order page.
+  const next = safeNextPath(form.get('next'))
   let destination: string | undefined
 
   try {
@@ -97,7 +100,11 @@ export async function submitCustomerAuth(
     const payload = await getPayload({ config })
     if (!(await allowAuthRequest(payload, mode, origin.requestHeaders, email)))
       return problem('rateLimited')
-    const context = { customerLocale: locale, customerOrigin: origin.canonical }
+    const context = {
+      customerLocale: locale,
+      customerOrigin: origin.canonical,
+      ...(next ? { customerNext: next } : {}),
+    }
 
     switch (mode) {
       case 'login': {
@@ -116,7 +123,7 @@ export async function submitCustomerAuth(
         })
         if (!session) return problem('invalidCredentials')
         await setCustomerSession(session)
-        destination = '/account'
+        destination = next ?? '/account'
         break
       }
       case 'signup': {
@@ -156,7 +163,7 @@ export async function submitCustomerAuth(
               `)
             : null
           destination = result?.rows.length
-            ? '/login?status=verified'
+            ? `/login?status=verified${next ? `&next=${encodeURIComponent(next)}` : ''}`
             : '/verify-email?status=invalid-link'
           break
         }

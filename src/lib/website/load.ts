@@ -5,6 +5,8 @@ import { cache } from 'react'
 
 import type { Footer, Home, Media, Navbar, Service } from '@/payload-types'
 import type { WebsiteLocale, WebsitePageSlug } from '@/lib/pages'
+import { vatRateOf } from '@/lib/shop/config'
+import type { VatRate } from '@/lib/shop/types'
 import { WEBSITE_CACHE_BUILD, WEBSITE_CACHE_SECONDS, WEBSITE_CACHE_TAG } from './cache'
 
 /** Every fixed page global has the same fields (see src/globals/pages.ts). */
@@ -20,7 +22,10 @@ export type ContentSection = NonNullable<WebsitePage['sections']>[number]
  */
 const publicRead = () => getPayload({ config })
 
-function cached<Args extends unknown[], Result>(key: string, fn: (...args: Args) => Promise<Result>) {
+function cached<Args extends unknown[], Result>(
+  key: string,
+  fn: (...args: Args) => Promise<Result>,
+) {
   return cache(
     unstable_cache(fn, ['website', WEBSITE_CACHE_BUILD, key], {
       tags: [WEBSITE_CACHE_TAG],
@@ -48,17 +53,19 @@ export const loadPage = cached(
 )
 
 export const loadNavbar = cached(
-  'loadNavbar',async (locale: WebsiteLocale): Promise<Navbar | null> => {
-  const payload = await publicRead()
-  const navbar = await payload.findGlobal({
-    slug: 'navbar',
-    locale,
-    fallbackLocale: 'de',
-    overrideAccess: false,
-    depth: 1,
-  })
-  return published(navbar)
-})
+  'loadNavbar',
+  async (locale: WebsiteLocale): Promise<Navbar | null> => {
+    const payload = await publicRead()
+    const navbar = await payload.findGlobal({
+      slug: 'navbar',
+      locale,
+      fallbackLocale: 'de',
+      overrideAccess: false,
+      depth: 1,
+    })
+    return published(navbar)
+  },
+)
 
 export const loadFooter = cached(
   'loadFooter',
@@ -75,27 +82,32 @@ export const loadFooter = cached(
       loadNavbar(locale),
     ])
     const own = published(footer)
-    const logo = (typeof own?.logo === 'object' && own.logo) || (typeof navbar?.logo === 'object' && navbar.logo) || null
+    const logo =
+      (typeof own?.logo === 'object' && own.logo) ||
+      (typeof navbar?.logo === 'object' && navbar.logo) ||
+      null
     return { footer: own, logo }
   },
 )
 
 /** Published services in their sort order (for service cards and the services overview). */
 export const loadServices = cached(
-  'loadServices',async (locale: WebsiteLocale): Promise<Service[]> => {
-  const payload = await publicRead()
-  const { docs } = await payload.find({
-    collection: 'services',
-    locale,
-    fallbackLocale: 'de',
-    overrideAccess: false,
-    depth: 1,
-    limit: 50,
-    sort: 'sortOrder',
-    where: { _status: { equals: 'published' } },
-  })
-  return docs
-})
+  'loadServices',
+  async (locale: WebsiteLocale): Promise<Service[]> => {
+    const payload = await publicRead()
+    const { docs } = await payload.find({
+      collection: 'services',
+      locale,
+      fallbackLocale: 'de',
+      overrideAccess: false,
+      depth: 1,
+      limit: 50,
+      sort: 'sortOrder',
+      where: { _status: { equals: 'published' } },
+    })
+    return docs
+  },
+)
 
 export const loadService = cached(
   'loadService',
@@ -118,9 +130,33 @@ export const loadService = cached(
 export function usesServiceCards(sections: WebsitePage['sections']) {
   return Boolean(
     sections?.some((section) =>
-      [section.column1, 'column2' in section ? section.column2 : null, 'column3' in section ? section.column3 : null].some(
-        (column) => column?.content?.some((item) => item.type === 'services'),
-      ),
+      [
+        section.column1,
+        'column2' in section ? section.column2 : null,
+        'column3' in section ? section.column3 : null,
+      ].some((column) => column?.content?.some((item) => item.type === 'services')),
     ),
   )
 }
+
+/** Public shop settings for prices on the website (the notification email is never readable here). */
+export const loadShopSettings = cached(
+  'loadShopSettings',
+  async (
+    locale: WebsiteLocale,
+  ): Promise<{ vatRate: VatRate; priceNote: string; orderingEnabled: boolean }> => {
+    const payload = await publicRead()
+    const settings = await payload.findGlobal({
+      slug: 'shop-settings',
+      locale,
+      fallbackLocale: 'de',
+      overrideAccess: false,
+      depth: 0,
+    })
+    return {
+      vatRate: vatRateOf(settings.vatRate),
+      priceNote: settings.priceNote ?? '',
+      orderingEnabled: settings.orderingEnabled === true,
+    }
+  },
+)

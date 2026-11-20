@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import type { ReactNode } from 'react'
 
 import { websitePage, type WebsiteLocale, type WebsitePageSlug } from '@/lib/pages'
 import { loadPage, loadServices, usesServiceCards, type WebsitePage } from '@/lib/website/load'
@@ -37,7 +38,13 @@ export async function WebsitePageView({
   slug,
   params,
   fallback,
-}: PageProps & { slug: WebsitePageSlug; fallback?: Partial<WebsitePage> }) {
+  afterHeading,
+}: PageProps & {
+  slug: WebsitePageSlug
+  fallback?: Partial<WebsitePage>
+  /** Rendered between the page heading and the sections, e.g. the pricing grid. */
+  afterHeading?: ReactNode
+}) {
   const locale = (await params).locale as WebsiteLocale
   // Lets next-intl render this page statically (no request headers needed).
   setRequestLocale(locale)
@@ -70,6 +77,7 @@ export async function WebsitePageView({
             subtitle={page.subtitle}
             actions={page.actions}
           />
+          {afterHeading}
           {sections}
         </>
       )}

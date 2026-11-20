@@ -8,8 +8,9 @@ import { MediaImage } from '@/components/site/media-image'
 import { Sections } from '@/components/site/sections'
 import { isSlug } from '@/fields/slug'
 import { Link } from '@/i18n/navigation'
-import { servicePath, type WebsiteLocale } from '@/lib/pages'
-import { loadService, loadServices, usesServiceCards } from '@/lib/website/load'
+import { orderPath, servicePath, type WebsiteLocale } from '@/lib/pages'
+import { orderingConfig } from '@/lib/shop/config'
+import { loadService, loadServices, loadShopSettings, usesServiceCards } from '@/lib/website/load'
 import { SITE_NAME, seoMetadata } from '@/lib/website/metadata'
 import { faqJsonLd } from '@/lib/website/structured-data'
 
@@ -23,7 +24,10 @@ export function generateStaticParams() {
 async function serviceFor(params: Props['params']) {
   const { locale, slug } = await params
   if (!isSlug(slug)) return { locale: locale as WebsiteLocale, service: null }
-  return { locale: locale as WebsiteLocale, service: await loadService(slug, locale as WebsiteLocale) }
+  return {
+    locale: locale as WebsiteLocale,
+    service: await loadService(slug, locale as WebsiteLocale),
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -42,10 +46,13 @@ export default async function ServicePage({ params }: Props) {
   const { locale, service } = await serviceFor(params)
   setRequestLocale(locale)
   if (!service) notFound()
-  const [t, services] = await Promise.all([
+  const [t, shop, services, settings] = await Promise.all([
     getTranslations({ locale, namespace: 'Services' }),
+    getTranslations({ locale, namespace: 'Shop' }),
     usesServiceCards(service.sections) ? loadServices(locale) : Promise.resolve([]),
+    loadShopSettings(locale),
   ])
+  const orderable = settings.orderingEnabled && orderingConfig(service).mode === 'order'
   return (
     <>
       <nav aria-label={t('breadcrumb')} className="pt-8 text-sm text-muted">
@@ -57,23 +64,39 @@ export default async function ServicePage({ params }: Props) {
       </nav>
       <header className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2">
         <div>
-          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{service.title}</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            {service.title}
+          </h1>
           <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{service.summary}</p>
           {service.keyPoints?.length ? (
             <ul className="mt-6 space-y-2">
               {service.keyPoints.map((point) => (
                 <li key={point.id} className="flex gap-3">
-                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
+                  <span
+                    aria-hidden="true"
+                    className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                  />
                   {point.text}
                 </li>
               ))}
             </ul>
           ) : null}
-          <Link href="/contact" className={`mt-8 ${buttonClass('primary')}`}>
-            {t('cta')}
-          </Link>
+          {orderable ? (
+            <Link href={orderPath(service.slug)} className={`mt-8 ${buttonClass('primary')}`}>
+              {shop('configureAndOrder')}
+            </Link>
+          ) : (
+            <Link href="/contact" className={`mt-8 ${buttonClass('primary')}`}>
+              {t('cta')}
+            </Link>
+          )}
         </div>
-        <MediaImage media={service.image} fit="landscape" sizes="(min-width: 1024px) 50vw, 100vw" priority />
+        <MediaImage
+          media={service.image}
+          fit="landscape"
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          priority
+        />
       </header>
       <Sections sections={service.sections} locale={locale} services={services} />
       <JsonLd data={faqJsonLd(service.sections)} />

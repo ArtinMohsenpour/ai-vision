@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin, publishedOrAdmin } from '@/access'
 import { sectionsField } from '@/blocks/layouts'
 import { seoFields } from '@/fields/seo'
+import { orderingTab } from '@/fields/ordering'
 import { slugField } from '@/fields/slug'
 import { protectCollectionDrafts } from '@/hooks/protect-drafts'
 import { revalidateDeletedDocument, revalidateDocument } from '@/hooks/revalidate'
@@ -86,6 +87,7 @@ export const Services: CollectionConfig = {
           ],
         },
         { label: 'Content', fields: [sectionsField()] },
+        orderingTab,
         { label: 'SEO', fields: seoFields },
       ],
     },
