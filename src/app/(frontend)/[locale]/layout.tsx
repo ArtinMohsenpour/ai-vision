@@ -29,7 +29,11 @@ export const revalidate = 86400
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'Meta' })
-  return { title: t('title'), description: t('description') }
+  return {
+    title: t('title'),
+    description: t('description'),
+    icons: { icon: { url: '/icon.svg', type: 'image/svg+xml' } },
+  }
 }
 
 export default async function LocaleLayout({ children, params }: Props) {

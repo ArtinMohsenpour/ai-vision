@@ -42,7 +42,7 @@ An unpublished page returns 404, except Home, which shows a short placeholder fr
 ## Editing a page
 
 1. Choose the language with the locale selector. German is the default; English falls back to German.
-2. **Heading**: eyebrow, page title (H1), subtitle and up to two buttons. On Home this tab is called **Hero**: the final hero design is still a placeholder (`src/components/site/hero.tsx`), but it already shows these texts, and the new design will keep using them.
+2. **Heading**: eyebrow, page title (H1), subtitle and up to two buttons. On Home, published service links surround the Rheino wordmark over the Rhine. The eyebrow appears under the name, and the title and subtitle provide additional screen-reader context. Buttons sit in the fade below the service map. **Hero artwork** optionally replaces the landscape in each language. The links follow the titles and sort order of published service pages. Visitors can pause the moving light trails, and reduced-motion preferences show a static map.
 3. **Content**: add sections and choose **100%**, **50% / 50%** or **33% / 33% / 33%**. Each column holds content items:
    - **Rich text**: headings H2–H4, lists, quotes, bold, italic, links. Local links like `/about` get `/en` on English pages.
    - **Image** from the media library, with original, 4:3 or square crop and a caption.
@@ -66,8 +66,8 @@ Only the destination of the chosen kind is saved. Unsafe or incomplete links are
 
 ## Navigation and footer
 
-- **Navigation**: optional logo (otherwise the text "AI Vision"), up to eight items. Text links and dropdowns (up to twelve links with short descriptions) sit next to the logo. Items with the **button** appearance appear on the right as call-to-action buttons. The bar always adds, on the right, the DE/EN switch, the light/dark theme switch and the **Log in** button (`/login`, a placeholder page until customer accounts are built). On phones and tablets the links and buttons open in a menu over the page.
-- **Footer**: logo (falls back to the navigation logo), tagline, contact details, up to four link columns, social profiles, copyright (`{year}` becomes the current year) and legal links. Empty parts are hidden.
+- **Navigation**: optional logo (otherwise the built-in Rheino logo, `src/components/site/brand-logo.tsx`), up to eight items. Text links and dropdowns (up to twelve links with short descriptions) sit next to the logo. Items with the **button** appearance appear on the right as call-to-action buttons. The bar always adds, on the right, the DE/EN switch, the light/dark theme switch and the **Log in** button (`/login`, a placeholder page until customer accounts are built). On phones and tablets the links and buttons open in a menu over the page.
+- **Footer**: logo (falls back to the navigation logo, then the built-in Rheino logo), tagline, contact details, up to four link columns, social profiles, copyright (`{year}` becomes the current year) and legal links. Empty parts are hidden.
 
 ## Theme
 

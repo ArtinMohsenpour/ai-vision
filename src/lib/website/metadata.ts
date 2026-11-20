@@ -5,7 +5,7 @@ import { mediaPath } from '@/lib/media-url'
 import type { WebsiteLocale } from '@/lib/pages'
 import type { Media } from '@/payload-types'
 
-export const SITE_NAME = 'AI Vision'
+export const SITE_NAME = 'Rheino'
 
 export function siteOrigin() {
   return new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').origin

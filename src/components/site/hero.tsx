@@ -1,39 +1,179 @@
-import type { WebsitePage } from '@/lib/website/load'
-import { buttonClass, CmsLink } from './cms-link'
+import type { CSSProperties } from 'react'
+import { getTranslations } from 'next-intl/server'
 
-/**
- * HERO PLACEHOLDER. The final hero is still to be designed. Its texts already come from the
- * Home global's "Hero" tab (eyebrow, title, subtitle, buttons); keep using those fields when the
- * new design replaces this component. The visual on the right is decorative only.
- */
-export function Hero({ eyebrow, title, subtitle, actions }: Pick<WebsitePage, 'eyebrow' | 'title' | 'subtitle' | 'actions'>) {
+import { Link } from '@/i18n/navigation'
+import { servicePath } from '@/lib/pages'
+import { SITE_NAME } from '@/lib/website/metadata'
+import type { WebsitePage } from '@/lib/website/load'
+import type { Service } from '@/payload-types'
+import { buttonClass, CmsLink } from './cms-link'
+import { HeroMap } from './hero-map'
+import { HeroScene } from './hero-scene'
+import styles from './hero.module.css'
+import { isPublicMedia, ResponsiveImage } from './media-image'
+
+type HeroProps = Pick<WebsitePage, 'eyebrow' | 'title' | 'subtitle' | 'actions' | 'heroArtwork'> & {
+  services: Service[]
+}
+
+// Slugs identify the studio's services across both locales. New services get a neutral icon.
+const servicePaths: Record<string, string> = {
+  'ki-telefon-und-chat-assistenten': 'M4 5h16v12h-9l-5 4v-4H4z M8 11h1m3-3v6m3-4v2',
+  'ki-automatisierung':
+    'M2 9h6v6H2z M16 2h6v6h-6z M16 16h6v6h-6z M8 12h2a3 3 0 0 0 3-3V8a3 3 0 0 1 3-3 M10 12a3 3 0 0 1 3 3v1a3 3 0 0 0 3 3',
+  websites: 'M2 4h20v16H2z M2 9h20 M5 6.5h1m2 0h1',
+  'seo-und-ki-suche': 'M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z M15 15l6 6 M7 12l3-4 3 1',
+  'software-und-apps': 'm7 6-6 6 6 6m10-12 6 6-6 6m-3-15-4 18',
+  web3: 'm12 2 9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10 M7.5 4.5l9 5v5',
+}
+
+function ServiceIcon({ slug }: { slug: string }) {
   return (
-    <section data-hero="placeholder" aria-labelledby="hero-title" className="grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
-        {eyebrow?.trim() && <p className="text-primary mb-4 text-xs font-semibold tracking-[0.18em] uppercase">{eyebrow}</p>}
-        <h1 id="hero-title" className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {title}
-        </h1>
-        {subtitle?.trim() && <p className="text-muted mt-6 max-w-xl text-lg leading-relaxed text-pretty">{subtitle}</p>}
+    <svg
+      aria-hidden="true"
+      width="23"
+      height="23"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    >
+      <path d={servicePaths[slug] ?? 'm12 2 10 6-10 6L2 8z M2 13l10 6 10-6'} />
+    </svg>
+  )
+}
+
+// Each layout specifies the button center (% of the map) and the border the current meets.
+// On phones the buttons are centered: the top three are entered from the left, the bottom three from the right.
+const branches = [
+  { wide: [27, 20, 'bottom'], phone: [50, 8, 'left'] },
+  { wide: [73, 20, 'bottom'], phone: [50, 21, 'left'] },
+  { wide: [13, 50, 'right'], phone: [50, 34, 'left'] },
+  { wide: [87, 50, 'left'], phone: [50, 66, 'right'] },
+  { wide: [27, 80, 'top'], phone: [50, 79, 'right'] },
+  { wide: [73, 80, 'top'], phone: [50, 92, 'right'] },
+] as const
+
+function ServiceNode({ service, slot }: { service: Service; slot?: number }) {
+  const branch = slot === undefined ? undefined : branches[slot]
+  const position =
+    branch &&
+    ({
+      '--x': branch.wide[0] + 'cqw',
+      '--y': branch.wide[1] + '%',
+      '--wide-edge': branch.wide[2],
+      '--phone-x': branch.phone[0] + 'cqw',
+      '--phone-y': branch.phone[1] + '%',
+      '--phone-edge': branch.phone[2],
+      '--delay': `${(slot ?? 0) * -1.13}s`,
+    } as CSSProperties)
+  return (
+    <li className={branch ? styles.node : undefined} data-slot={slot} style={position}>
+      {branch && (
+        <svg className={styles.current} fill="none" aria-hidden="true">
+          <defs>
+            <path id={`hero-current-${slot}`} />
+          </defs>
+          <use href={`#hero-current-${slot}`} className={styles.thread} />
+          <path className={styles.filament} />
+          <use href={`#hero-current-${slot}`} className={styles.beads} />
+          <use data-knot="" href={`#hero-current-${slot}`} className={styles.knot} />
+        </svg>
+      )}
+      <Link data-glass-service="" className={styles.service} href={servicePath(service.slug)}>
+        <span className={styles.icon}>
+          <ServiceIcon slug={service.slug} />
+        </span>
+        <span>{service.title}</span>
+      </Link>
+    </li>
+  )
+}
+
+export async function Hero({
+  eyebrow,
+  title,
+  subtitle,
+  actions,
+  heroArtwork,
+  services,
+}: HeroProps) {
+  const t = await getTranslations()
+  const featured = services.slice(0, branches.length)
+  const remaining = services.slice(branches.length)
+  const customArtwork = isPublicMedia(heroArtwork) ? heroArtwork : null
+  return (
+    <section data-home-hero="" aria-labelledby="hero-title">
+      <HeroScene
+        pauseLabel={t('Home.pauseMotion')}
+        playLabel={t('Home.playMotion')}
+        animateLandscape={!customArtwork}
+        landscape={
+          customArtwork ? (
+            <ResponsiveImage media={customArtwork} priority sizes="100vw" alt="" />
+          ) : (
+            <picture>
+              <source media="(max-width: 639px)" srcSet="/hero/rhine-landscape-phone.webp" />
+              <img
+                src="/hero/rhine-landscape-wide.webp"
+                width="1600"
+                height="680"
+                alt=""
+                fetchPriority="high"
+              />
+            </picture>
+          )
+        }
+      >
+        <HeroMap>
+          <div className={styles.identity}>
+            <h1 id="hero-title">
+              <span className={styles.wordmark}>{SITE_NAME}</span>
+              {title?.trim() && <span className="sr-only"> — {title}</span>}
+            </h1>
+            {eyebrow?.trim() && <p className={styles.eyebrow}>{eyebrow}</p>}
+            {subtitle?.trim() && <p className="sr-only">{subtitle}</p>}
+          </div>
+          {featured.length > 0 && (
+            <nav className={styles.network} aria-label={t('Services.overview')}>
+              <ul>
+                {featured.map((service, index) => (
+                  <ServiceNode
+                    key={service.id}
+                    service={service}
+                    slot={Math.floor((index * branches.length) / featured.length)}
+                  />
+                ))}
+              </ul>
+            </nav>
+          )}
+        </HeroMap>
+        {remaining.length > 0 && (
+          <nav className={styles.overflow} aria-label={t('Services.overview')}>
+            <ul>
+              {remaining.map((service) => (
+                <ServiceNode key={service.id} service={service} />
+              ))}
+            </ul>
+          </nav>
+        )}
         {actions?.length ? (
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className={styles.actions}>
             {actions.map((action) => (
-              <CmsLink key={action.id} link={action.link} className={buttonClass(action.appearance)}>
+              <CmsLink
+                key={action.id}
+                link={action.link}
+                newTabLabel={t('Navigation.newTab')}
+                className={buttonClass(action.appearance, 'compact')}
+              >
                 {action.label}
               </CmsLink>
             ))}
           </div>
         ) : null}
-      </div>
-      <div aria-hidden="true" className="border-border bg-surface relative hidden aspect-[5/4] overflow-hidden rounded-[2rem] border lg:block">
-        <div className="bg-primary/25 absolute -top-16 -left-10 size-72 rounded-full blur-3xl" />
-        <div className="bg-accent absolute -right-12 -bottom-20 size-80 rounded-full blur-2xl" />
-        <div className="absolute inset-10 grid grid-cols-3 gap-4">
-          {Array.from({ length: 6 }, (_, index) => (
-            <div key={index} className={`border-border bg-background/70 rounded-2xl border ${index % 4 === 0 ? 'col-span-2' : ''}`} />
-          ))}
-        </div>
-      </div>
+      </HeroScene>
     </section>
   )
 }

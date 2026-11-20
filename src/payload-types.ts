@@ -818,6 +818,10 @@ export interface Home {
       }[]
     | null;
   /**
+   * Optional. Leave empty to use the Rhine landscape behind the wordmark and service links.
+   */
+  heroArtwork?: (number | null) | Media;
+  /**
    * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
    */
   sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
@@ -1506,7 +1510,7 @@ export interface Footer {
       }[]
     | null;
   /**
-   * Use {year} for the current year, e.g. © {year} AI Vision.
+   * Leave blank to use the current site name. Use {year} in a custom copyright notice.
    */
   copyright?: string | null;
   /**
@@ -1566,6 +1570,7 @@ export interface HomeSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  heroArtwork?: T;
   sections?: T | {};
   seo?:
     | T

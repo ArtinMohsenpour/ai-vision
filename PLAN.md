@@ -39,7 +39,7 @@ Rules:
 
 ### Globals
 
-Every fixed website page is its own global, with its own editor in the admin sidebar (the Taxful pattern). All pages, including the service pages collection, sit in one **Pages** sidebar group and share one model: heading (eyebrow, H1, subtitle, up to two buttons; on Home the **Hero** tab, a placeholder until the hero is designed), page sections and SEO, with drafts and the last 25 versions. Pages are cached and refreshed on publish. See `docs/cms.md`.
+Every fixed website page is its own global, with its own editor in the admin sidebar (the Taxful pattern). All pages, including the service pages collection, sit in one **Pages** sidebar group and share one model: heading (eyebrow, H1, subtitle, up to two buttons; on Home the **Hero** tab also offers a background override for the Rheino service map), page sections and SEO, with drafts and the last 25 versions. Pages are cached and refreshed on publish. See `docs/cms.md`.
 
 | Global              | Route         | Sidebar group | Fields                                                                                                            |
 | ------------------- | ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |

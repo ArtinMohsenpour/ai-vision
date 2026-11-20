@@ -207,7 +207,6 @@ export function pageData(locale: Locale): Record<string, Record<string, unknown>
         action(t('Kontakt', 'Contact'), page('contact'), 'secondary'),
       ],
       sections: [
-        fullWidth({ eyebrow: t('Leistungen', 'Services'), title: t('Was wir für Sie tun', 'What we do for you') }, [serviceCards()]),
         fullWidth({ title: t('Warum mit uns arbeiten', 'Why work with us'), tone: 'surface' }, [
           cards([
             [t('Feste Preise', 'Fixed prices'), t('Sie wissen vorher, was es kostet.', 'You know the cost before we start.')],
@@ -421,7 +420,6 @@ export function footerData(locale: Locale, services: { id: number; title: string
         ],
       },
     ],
-    copyright: '© {year} AI Vision',
     legalLinks: [
       navLink(t('Impressum', 'Legal notice'), page('impressum')),
       navLink(t('Datenschutz', 'Privacy'), page('privacy')),

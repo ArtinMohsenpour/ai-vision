@@ -1,6 +1,6 @@
-# AI Vision — project instructions
+# Rheino — project instructions
 
-Working name only; the company name is not decided yet.
+The company name is Rheino.
 
 ## Start here
 

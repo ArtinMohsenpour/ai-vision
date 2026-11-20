@@ -1,9 +1,11 @@
 {
   "Meta": {
-    "title": "AI Vision",
+    "title": "Rheino",
     "description": "Software, Websites und KI-Lösungen für kleine Unternehmen."
   },
   "Home": {
+    "pauseMotion": "Animation pausieren",
+    "playMotion": "Animation abspielen",
     "eyebrow": "Bald online",
     "title": "Software, Websites und KI für Ihr Unternehmen",
     "body": "Hier entsteht unsere Website. Inhalte, Leistungen und Pakete werden im CMS gepflegt."
