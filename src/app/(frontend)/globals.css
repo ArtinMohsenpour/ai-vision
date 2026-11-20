@@ -15,6 +15,19 @@
   --border: light-dark(#e4e2db, #272b28);
   --surface: light-dark(#ffffff, #171a18);
   --accent: light-dark(#e7f0ec, #1a2924);
+  --hero-stage: light-dark(#132732, #0d1e27);
+  --hero-pearl: #f3faf8;
+  --hero-ink: light-dark(#10313b, #f3faf8);
+  --hero-current: light-dark(#316771, #c6e9e1);
+  --hero-haze: light-dark(rgb(229 243 245 / 70%), rgb(10 28 38 / 36%));
+  --hero-sky: light-dark(rgb(220 237 241 / 56%), rgb(9 25 34 / 18%));
+  --hero-water: light-dark(rgb(219 237 241 / 17%), rgb(9 25 34 / 36%));
+  --hero-glass: light-dark(rgb(232 249 255 / 9%), rgb(10 33 49 / 8%));
+  --hero-glass-solid: light-dark(#dcecee, #29434d);
+  --hero-glass-edge: light-dark(rgb(37 73 89 / 24%), rgb(205 235 246 / 28%));
+  --hero-label-shadow: light-dark(rgb(242 252 255 / 85%), rgb(4 18 30 / 80%));
+  --hero-depth: light-dark(rgb(28 64 79 / 20%), rgb(2 16 22 / 36%));
+  --navbar-height: 4rem;
 }
 
 :root[data-theme='light'] {
@@ -48,6 +61,46 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* The homepage stage runs edge to edge. The Rhine backdrop fades into the page background. */
+#main:has(> [data-home-hero]) {
+  max-width: none;
+  padding-inline: 0;
+}
+
+[data-site-header] button:enabled {
+  cursor: pointer;
+}
+
+/*
+ * The stage also runs up behind the navbar. At the top of the page the bar is clear and a soft
+ * scrim fades it into the landscape; it frosts over once the page scrolls or the menu opens.
+ */
+[data-site-header]::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -1.5rem;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(color-mix(in srgb, var(--background) 72%, transparent), transparent);
+  opacity: 0;
+}
+html:has(#main > [data-home-hero]) [data-site-header][data-clear] {
+  border-color: transparent;
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html:has(#main > [data-home-hero]) [data-site-header][data-clear]::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-site-header],
+  [data-site-header]::before {
+    transition: 0.3s ease-out;
+    transition-property: background-color, border-color, backdrop-filter, opacity;
+  }
 }
 
 /* Rich text from the CMS (src/components/site/rich-text.tsx). */

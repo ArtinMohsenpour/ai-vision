@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { Link, usePathname } from '@/i18n/navigation'
 import { resolveLink, type StoredLink } from '@/lib/links'
 import { LOGIN_PATH } from '@/lib/pages'
-import { SITE_NAME } from '@/lib/website/metadata'
 import type { Navbar } from '@/payload-types'
+import { BrandLogo } from './brand-logo'
 import { buttonClass, CmsLink } from './cms-link'
 import { LanguageSwitcher } from './language-switcher'
 import { isPublicMedia, Logo } from './media-image'
@@ -35,6 +35,12 @@ const linkClass = (active: boolean, variant: Variant) =>
       ? 'rounded-full px-3 py-2 text-sm'
       : 'w-full justify-between rounded-xl px-3 py-3 text-base'
   } ${active ? 'text-foreground bg-foreground/5' : 'text-muted hover:text-foreground hover:bg-foreground/5'}`
+
+function subscribeToScroll(onChange: () => void) {
+  addEventListener('scroll', onChange, { passive: true })
+  return () => removeEventListener('scroll', onChange)
+}
+const atPageTop = () => scrollY < 8
 
 /** Grid-rows trick: animates height from 0 to auto. */
 const collapse = (open: boolean) =>
@@ -252,6 +258,7 @@ function Actions({
 export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: NavbarLabels }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const atTop = useSyncExternalStore(subscribeToScroll, atPageTop, () => true)
   const toggle = useRef<HTMLButtonElement>(null)
   const logo = typeof navbar?.logo === 'object' ? navbar.logo : null
   const items = navbar?.items ?? []
@@ -277,7 +284,10 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
 
   return (
     <header
-      className="border-border/70 bg-background/80 sticky top-0 z-30 border-b backdrop-blur-xl backdrop-saturate-150"
+      // Over the homepage hero the bar is clear until the page scrolls or the menu opens (globals.css).
+      data-site-header=""
+      data-clear={atTop && !open ? '' : undefined}
+      className="border-border/70 bg-background/80 sticky top-0 z-30 h-(--navbar-height) border-b backdrop-blur-xl backdrop-saturate-150"
       onKeyDown={(event) => {
         if (event.key === 'Escape' && open) {
           setOpen(false)
@@ -291,24 +301,24 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
       >
         {labels.skip}
       </a>
-      <nav aria-label={labels.label} className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex h-16 items-center gap-2">
+      <nav aria-label={labels.label} className="mx-auto h-full max-w-6xl px-4 sm:px-6">
+        <div className="flex h-full items-center gap-2 max-[359px]:gap-1">
           <Link
             href="/"
             aria-label={labels.home}
             onClick={close}
-            className={`mr-4 flex min-w-0 shrink-0 items-center rounded-lg ${focusRing}`}
+            className={`mr-4 flex min-w-0 shrink-0 items-center rounded-lg max-[359px]:mr-0 ${focusRing}`}
           >
             {isPublicMedia(logo) ? (
               <Logo media={logo} className="h-8 w-auto max-w-40 object-contain" />
             ) : (
-              <span className="text-lg font-semibold tracking-tight">{SITE_NAME}</span>
+              <BrandLogo className="h-8 w-auto max-[359px]:h-7" />
             )}
           </Link>
           <ul className="hidden items-center gap-0.5 lg:flex">
             <NavItems items={links} variant="bar" {...shared} />
           </ul>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 max-[359px]:gap-1.5">
             <LanguageSwitcher label={labels.language} />
             <ThemeToggle label={labels.theme} />
             <div className="hidden items-center gap-2 pl-1 lg:flex">
@@ -354,7 +364,7 @@ export function NavbarView({ navbar, labels }: { navbar: Navbar | null; labels: 
           }`}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="mx-auto max-h-[calc(100dvh-4rem)] max-w-6xl overflow-y-auto overscroll-contain px-4 pt-3 pb-6 sm:px-6">
+            <div className="mx-auto max-h-[calc(100dvh-var(--navbar-height))] max-w-6xl overflow-y-auto overscroll-contain px-4 pt-3 pb-6 sm:px-6">
               <ul className="space-y-0.5">
                 <NavItems items={links} variant="menu" {...shared} />
               </ul>

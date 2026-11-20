@@ -1,9 +1,11 @@
 {
   "Meta": {
-    "title": "AI Vision",
+    "title": "Rheino",
     "description": "Software, websites and AI solutions for small businesses."
   },
   "Home": {
+    "pauseMotion": "Pause animation",
+    "playMotion": "Play animation",
     "eyebrow": "Coming soon",
     "title": "Software, websites and AI for your business",
     "body": "Our website is under construction. Content, services and packages will be managed in the CMS."

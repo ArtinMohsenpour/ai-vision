@@ -5,6 +5,7 @@ import type { WebsiteLocale } from '@/lib/pages'
 import { socialLabel } from '@/lib/social'
 import { loadFooter } from '@/lib/website/load'
 import { SITE_NAME } from '@/lib/website/metadata'
+import { BrandLogo } from './brand-logo'
 import { CmsLink } from './cms-link'
 import { isPublicMedia, Logo } from './media-image'
 import { SocialIcon } from './social-icon'
@@ -26,7 +27,7 @@ export async function Footer() {
           {isPublicMedia(logo) ? (
             <Logo media={logo} className="h-9 w-auto max-w-40 object-contain" />
           ) : (
-            <p className="text-lg font-semibold tracking-tight">{SITE_NAME}</p>
+            <BrandLogo className="h-10 w-auto" />
           )}
           {footer?.tagline && <p className="max-w-sm text-sm leading-relaxed text-muted">{footer.tagline}</p>}
           {(contact?.email || contact?.phone || contact?.address) && (

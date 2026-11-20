@@ -13,7 +13,10 @@ import { Sections } from './sections'
 
 export type PageProps = { params: Promise<{ locale: string }> }
 
-export async function websitePageMetadata(slug: WebsitePageSlug, { params }: PageProps): Promise<Metadata> {
+export async function websitePageMetadata(
+  slug: WebsitePageSlug,
+  { params }: PageProps,
+): Promise<Metadata> {
   const locale = (await params).locale as WebsiteLocale
   const page = await loadPage(slug, locale)
   const definition = websitePage(slug)!
@@ -22,7 +25,8 @@ export async function websitePageMetadata(slug: WebsitePageSlug, { params }: Pag
   return seoMetadata({
     path: definition.path,
     seo: page?.seo,
-    fallbackTitle: slug === 'home' ? t('title') : `${page?.title?.trim() || definition[locale]} | ${SITE_NAME}`,
+    fallbackTitle:
+      slug === 'home' ? t('title') : `${page?.title?.trim() || definition[locale]} | ${SITE_NAME}`,
     fallbackDescription: page?.subtitle || (slug === 'home' ? t('description') : undefined),
     locale,
   })
@@ -37,17 +41,38 @@ export async function WebsitePageView({
   const locale = (await params).locale as WebsiteLocale
   // Lets next-intl render this page statically (no request headers needed).
   setRequestLocale(locale)
-  const page = (await loadPage(slug, locale)) ?? (fallback ? (fallback as WebsitePage) : null)
+  const publishedPage = await loadPage(slug, locale)
+  const page = publishedPage ?? (fallback ? (fallback as WebsitePage) : null)
   if (!page) notFound()
-  const services = usesServiceCards(page.sections) ? await loadServices(locale) : []
+  const isHome = slug === 'home'
+  const services =
+    (isHome && publishedPage) || usesServiceCards(page.sections) ? await loadServices(locale) : []
+  const sections = <Sections sections={page.sections} locale={locale} services={services} />
   return (
     <>
-      {slug === 'home' ? (
-        <Hero eyebrow={page.eyebrow} title={page.title} subtitle={page.subtitle} actions={page.actions} />
+      {isHome ? (
+        <>
+          <Hero
+            eyebrow={page.eyebrow}
+            title={page.title}
+            subtitle={page.subtitle}
+            actions={page.actions}
+            heroArtwork={page.heroArtwork}
+            services={services}
+          />
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">{sections}</div>
+        </>
       ) : (
-        <PageHeading eyebrow={page.eyebrow} title={page.title} subtitle={page.subtitle} actions={page.actions} />
+        <>
+          <PageHeading
+            eyebrow={page.eyebrow}
+            title={page.title}
+            subtitle={page.subtitle}
+            actions={page.actions}
+          />
+          {sections}
+        </>
       )}
-      <Sections sections={page.sections} locale={locale} services={services} />
       <JsonLd data={faqJsonLd(page.sections)} />
     </>
   )

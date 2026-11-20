@@ -1,4 +1,4 @@
-# AI Vision (working name)
+# Rheino
 
 Company website: Next.js 16 + Payload 3 + PostgreSQL 18, in German and English. Payload controls content, packages and prices, and also holds the customer accounts, orders and quotes. Stripe handles payments.
 

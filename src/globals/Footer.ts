@@ -152,7 +152,7 @@ export const Footer: GlobalConfig = {
               type: 'text',
               localized: true,
               maxLength: 120,
-              admin: { description: 'Use {year} for the current year, e.g. © {year} AI Vision.' },
+              admin: { description: 'Leave blank to use the current site name. Use {year} in a custom copyright notice.' },
             },
             linkList(
               'legalLinks',

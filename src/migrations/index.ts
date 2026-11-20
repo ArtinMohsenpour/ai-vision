@@ -2,6 +2,11 @@ import * as migration_20261118_122202_initial from './20261118_122202_initial';
 import * as migration_20261118_123422_website_cms from './20261118_123422_website_cms';
 import * as migration_20261118_130550_admin_names_and_media from './20261118_130550_admin_names_and_media';
 import * as migration_20261118_155018_internal_links from './20261118_155018_internal_links';
+import * as migration_20261118_162225_home_hero_artwork from './20261118_162225_home_hero_artwork';
+
+import * as rheivoHomeContent from './20261118_165720_rheivo_home_content';
+
+import * as dynamicFooterBrand from './20261119_000001_dynamic_footer_brand';
 
 export const migrations = [
   {
@@ -22,6 +27,21 @@ export const migrations = [
   {
     up: migration_20261118_155018_internal_links.up,
     down: migration_20261118_155018_internal_links.down,
-    name: '20261118_155018_internal_links'
+    name: '20261118_155018_internal_links',
+  },
+  {
+    up: migration_20261118_162225_home_hero_artwork.up,
+    down: migration_20261118_162225_home_hero_artwork.down,
+    name: '20261118_162225_home_hero_artwork'
+  },
+  {
+    up: rheivoHomeContent.up,
+    down: rheivoHomeContent.down,
+    name: '20261118_165720_rheivo_home_content',
+  },
+  {
+    up: dynamicFooterBrand.up,
+    down: dynamicFooterBrand.down,
+    name: '20261119_000001_dynamic_footer_brand',
   },
 ];

@@ -21,9 +21,18 @@ const headingTab = (slug: WebsitePageSlug): Tab =>
   slug === 'home'
     ? {
         label: 'Hero',
-        description:
-          'Placeholder: the final hero design is still to come. These texts are already shown at the top of the home page and will be used by the new hero.',
-        fields: pageHeadingFields,
+        description: 'Published services surround the Rheino wordmark. The eyebrow appears beneath the name and buttons appear at the foot of the landscape.',
+        fields: [
+          ...pageHeadingFields,
+          {
+            name: 'heroArtwork',
+            label: 'Hero artwork',
+            type: 'upload',
+            relationTo: 'media',
+            localized: true,
+            admin: { description: 'Optional. Leave empty to use the Rhine landscape behind the wordmark and service links.' },
+          },
+        ],
       }
     : { label: 'Heading', fields: pageHeadingFields }
 
