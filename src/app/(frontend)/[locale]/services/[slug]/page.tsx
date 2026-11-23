@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation'
 
 import { buttonClass } from '@/components/site/cms-link'
 import { JsonLd } from '@/components/site/json-ld'
-import { MediaImage } from '@/components/site/media-image'
+import { isPublicMedia, MediaImage } from '@/components/site/media-image'
 import { Sections } from '@/components/site/sections'
+import { ServiceHero } from '@/components/site/service-hero'
 import { isSlug } from '@/fields/slug'
 import { Link } from '@/i18n/navigation'
 import { orderPath, servicePath, type WebsiteLocale } from '@/lib/pages'
@@ -53,53 +54,48 @@ export default async function ServicePage({ params }: Props) {
     loadShopSettings(locale),
   ])
   const orderable = settings.orderingEnabled && orderingConfig(service).mode === 'order'
+  const image = isPublicMedia(service.image) ? service.image : null
   return (
     <>
-      <nav aria-label={t('breadcrumb')} className="pt-8 text-sm text-muted">
-        <Link href="/services" className="hover:text-foreground">
-          {t('overview')}
-        </Link>
-        <span aria-hidden="true"> / </span>
-        <span aria-current="page">{service.title}</span>
-      </nav>
-      <header className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2">
-        <div>
-          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            {service.title}
-          </h1>
-          <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{service.summary}</p>
-          {service.keyPoints?.length ? (
-            <ul className="mt-6 space-y-2">
-              {service.keyPoints.map((point) => (
-                <li key={point.id} className="flex gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
-                  />
-                  {point.text}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {orderable ? (
-            <Link href={orderPath(service.slug)} className={`mt-8 ${buttonClass('primary')}`}>
-              {shop('configureAndOrder')}
+      <ServiceHero title={service.title} heroFeatures={service.heroFeatures} />
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <nav aria-label={t('breadcrumb')} className="pt-4 text-sm text-muted">
+          <Link href="/services" className="hover:text-foreground">
+            {t('overview')}
+          </Link>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">{service.title}</span>
+        </nav>
+        <header
+          className={`grid items-center gap-10 py-8 sm:py-12 ${image ? 'lg:grid-cols-2' : ''}`}
+        >
+          <div className="max-w-2xl">
+            <p className="text-lg leading-relaxed text-pretty text-muted">{service.summary}</p>
+            {service.keyPoints?.length ? (
+              <ul className="mt-6 space-y-2">
+                {service.keyPoints.map((point) => (
+                  <li key={point.id} className="flex gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                    />
+                    {point.text}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <Link
+              href={orderable ? orderPath(service.slug) : '/contact'}
+              className={`mt-8 ${buttonClass('primary')}`}
+            >
+              {orderable ? shop('configureAndOrder') : t('cta')}
             </Link>
-          ) : (
-            <Link href="/contact" className={`mt-8 ${buttonClass('primary')}`}>
-              {t('cta')}
-            </Link>
-          )}
-        </div>
-        <MediaImage
-          media={service.image}
-          fit="landscape"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          priority
-        />
-      </header>
-      <Sections sections={service.sections} locale={locale} services={services} />
-      <JsonLd data={faqJsonLd(service.sections)} />
+          </div>
+          <MediaImage media={image} fit="landscape" />
+        </header>
+        <Sections sections={service.sections} locale={locale} services={services} />
+        <JsonLd data={faqJsonLd(service.sections)} />
+      </div>
     </>
   )
 }

@@ -32,8 +32,13 @@
   "Services": {
     "readMore": "Learn more",
     "overview": "Services",
+    "heroFeatures": "Service features",
     "breadcrumb": "Breadcrumb",
-    "cta": "Start a project"
+    "cta": "Start a project",
+    "offerExtras": "Optional extras",
+    "offerExtrasHint": "You choose extras while configuring and see the price and delivery time right away.",
+    "offerCustom": "Ask for a custom quote",
+    "offerClosed": "Online ordering is closed right now. Write to us and we will gladly send you a quote."
   },
   "NotFound": {
     "title": "Page not found",
@@ -141,7 +146,8 @@
     "factorLabel": "Authenticator or recovery code",
     "factorSubmit": "Verify and sign in",
     "securityTitle": "Account security",
-    "ordersTitle": "Your orders"
+    "ordersTitle": "Your orders",
+    "continueOrder": "Sign in or create an account to finish your order. Your selection is saved and you'll come straight back to it."
   },
   "CustomerPortal": {
     "title": "My account",
@@ -299,6 +305,10 @@
       "unavailable": "Payment isn't available right now. Try again later or contact us.",
       "notFound": "We couldn't find this order.",
       "nothingDue": "Nothing is due on this order right now."
-    }
+    },
+    "signInTitle": "Sign in to order",
+    "signInBody": "Your selection is saved. Sign in or create a free business account, and you'll come straight back here to pay.",
+    "signIn": "Sign in",
+    "createAccount": "Create account"
   }
 }

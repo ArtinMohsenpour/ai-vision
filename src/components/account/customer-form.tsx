@@ -70,6 +70,8 @@ function CustomerFormContent({
   next,
   fragment,
 }: Props & { fragment: string | null }) {
+  // Coming from an order page: tell the customer their selection is waiting.
+  const continuesOrder = Boolean(next && /^\/services\/[a-z0-9-]+\/order(\?|$)/.test(next))
   // Keep the "continue to" path when switching between login and signup.
   const keepNext = (pathname: '/login' | '/signup') =>
     next ? { pathname, query: { next } } : pathname
@@ -214,7 +216,7 @@ function CustomerFormContent({
         <p className={styles.intro}>{t(`errors.${state.message}`)}</p>
         <p className={styles.help}>{t('checkSpam')}</p>
         <div className={styles.inboxLinks}>
-          <Link href="/login" className={styles.secondary}>
+          <Link href={keepNext('/login')} className={styles.secondary}>
             {t('backToLogin')}
           </Link>
           {signup && <Link href="/verify-email">{t('verifyLink')}</Link>}
@@ -250,6 +252,11 @@ function CustomerFormContent({
       )}
       <h1 className={styles.title}>{title}</h1>
       <p className={styles.intro}>{intro}</p>
+      {continuesOrder && !needsFactor && (mode === 'login' || signup) && (
+        <p className={styles.success} role="status">
+          {t('continueOrder')}
+        </p>
+      )}
       {mode === 'login' && !needsFactor && (status === 'verified' || status === 'resetDone') && (
         <p className={styles.success} role="status">
           {t(status)}

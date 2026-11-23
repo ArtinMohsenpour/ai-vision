@@ -32,8 +32,13 @@
   "Services": {
     "readMore": "Mehr erfahren",
     "overview": "Leistungen",
+    "heroFeatures": "Leistungsmerkmale",
     "breadcrumb": "Brotkrumen-Navigation",
-    "cta": "Projekt anfragen"
+    "cta": "Projekt anfragen",
+    "offerExtras": "Optional dazu",
+    "offerExtrasHint": "Extras wählen Sie beim Konfigurieren; Preis und Lieferzeit sehen Sie sofort.",
+    "offerCustom": "Individuelles Angebot anfragen",
+    "offerClosed": "Die Online-Bestellung ist gerade geschlossen. Schreiben Sie uns, wir erstellen Ihnen gern ein Angebot."
   },
   "NotFound": {
     "title": "Seite nicht gefunden",
@@ -141,7 +146,8 @@
     "factorLabel": "Authenticator- oder Wiederherstellungscode",
     "factorSubmit": "Bestätigen und anmelden",
     "securityTitle": "Kontosicherheit",
-    "ordersTitle": "Ihre Bestellungen"
+    "ordersTitle": "Ihre Bestellungen",
+    "continueOrder": "Melden Sie sich an oder erstellen Sie ein Konto, um Ihre Bestellung abzuschließen. Ihre Auswahl ist gespeichert und Sie kommen direkt dorthin zurück."
   },
   "CustomerPortal": {
     "title": "Mein Konto",
@@ -299,6 +305,10 @@
       "unavailable": "Die Zahlung ist gerade nicht verfügbar. Versuchen Sie es später erneut oder kontaktieren Sie uns.",
       "notFound": "Diese Bestellung wurde nicht gefunden.",
       "nothingDue": "Für diese Bestellung ist gerade nichts fällig."
-    }
+    },
+    "signInTitle": "Zum Bestellen anmelden",
+    "signInBody": "Ihre Auswahl ist gespeichert. Melden Sie sich an oder erstellen Sie ein kostenloses Geschäftskonto – danach geht es direkt hierher zurück zur Zahlung.",
+    "signIn": "Anmelden",
+    "createAccount": "Konto erstellen"
   }
 }

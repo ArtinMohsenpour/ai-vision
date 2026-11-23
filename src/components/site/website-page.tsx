@@ -9,10 +9,21 @@ import { SITE_NAME, seoMetadata } from '@/lib/website/metadata'
 import { faqJsonLd } from '@/lib/website/structured-data'
 import { Hero } from './hero'
 import { JsonLd } from './json-ld'
+import { PageBand } from './page-band'
 import { PageHeading } from './page-heading'
 import { Sections } from './sections'
 
 export type PageProps = { params: Promise<{ locale: string }> }
+
+// Marketing pages get the faint landscape band; legal pages stay plain. Home has its own hero.
+const BAND_PAGES: ReadonlySet<WebsitePageSlug> = new Set([
+  'services-overview',
+  'pricing',
+  'about',
+  'how-it-works',
+  'faq',
+  'contact',
+])
 
 export async function websitePageMetadata(
   slug: WebsitePageSlug,
@@ -71,6 +82,7 @@ export async function WebsitePageView({
         </>
       ) : (
         <>
+          {BAND_PAGES.has(slug) && <PageBand />}
           <PageHeading
             eyebrow={page.eyebrow}
             title={page.title}

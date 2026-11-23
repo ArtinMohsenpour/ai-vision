@@ -1,6 +1,6 @@
 'use client'
 
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 
 import styles from './hero.module.css'
 
@@ -16,6 +16,7 @@ function currentPath(
   edge: RimEdge,
   slot: number,
   phone: boolean,
+  service: boolean,
 ) {
   const centerX = button.left + button.width / 2 - map.left
   const centerY = button.top + button.height / 2 - map.top
@@ -27,7 +28,7 @@ function currentPath(
   const outward = leftPort ? -1 : 1
 
   // Allow for the side bearings of the italic R and o at the height of the connection.
-  const inkX = startX - outward * word.height * (leftPort ? 0.22 : 0.13)
+  const inkX = service ? startX : startX - outward * word.height * (leftPort ? 0.22 : 0.13)
   const start = `M ${inkX} ${startY} H ${startX}`
 
   // Land on the centerline of the one-pixel border, perpendicular to the chosen edge.
@@ -38,6 +39,16 @@ function currentPath(
   const endY = sideEntry
     ? centerY
     : (edge === 'bottom' ? button.bottom - 0.5 : button.top + 0.5) - map.top
+
+  if (service && phone) {
+    // Use the gap between the badge columns so paths can reach either row.
+    const middle = word.left + word.width / 2 - map.left
+    const side = edge === 'right' ? -1 : 1
+    const laneX = middle + side * (Math.abs(endY - startY) > 130 ? 6 : 11)
+    const originY = (above ? word.top : word.bottom) - map.top
+    const bendY = endY + (above ? 1 : -1) * Math.min(20, Math.abs(originY - endY) / 2)
+    return `M ${laneX} ${originY} V ${bendY} Q ${laneX} ${endY}, ${endX} ${endY}`
+  }
 
   if (!phone) {
     if (sideEntry) {
@@ -103,7 +114,15 @@ function engravedFilament(path: SVGPathElement, length: number) {
   return segments.join(' ')
 }
 
-export function HeroMap({ children }: { children: ReactNode }) {
+export function HeroMap({
+  children,
+  variant = 'home',
+  style,
+}: {
+  children: ReactNode
+  variant?: 'home' | 'service'
+  style?: CSSProperties
+}) {
   const ref = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => {
     const map = ref.current!
@@ -123,7 +142,15 @@ export function HeroMap({ children }: { children: ReactNode }) {
       const phone = getComputedStyle(map).getPropertyValue('--stacked-links').trim() === '1'
       const curves = nodes.map(({ button, slot }) => {
         const edge = getComputedStyle(button).getPropertyValue('--rim-joint').trim() as RimEdge
-        return currentPath(bounds, title, button.getBoundingClientRect(), edge, slot, phone)
+        return currentPath(
+          bounds,
+          title,
+          button.getBoundingClientRect(),
+          edge,
+          slot,
+          phone,
+          variant === 'service',
+        )
       })
       nodes.forEach(({ path }, i) => path.setAttribute('d', curves[i]))
       nodes.forEach(({ node, path, filament }) => {
@@ -141,10 +168,14 @@ export function HeroMap({ children }: { children: ReactNode }) {
     observer.observe(map.querySelector(`.${styles.identity}`)!)
     nodes.forEach(({ button }) => observer.observe(button))
     return () => observer.disconnect()
-  }, [children])
+  }, [children, variant])
 
   return (
-    <div ref={ref} className={styles.map}>
+    <div
+      ref={ref}
+      className={variant === 'service' ? `${styles.map} ${styles.serviceMap}` : styles.map}
+      style={style}
+    >
       {children}
     </div>
   )

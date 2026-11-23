@@ -7,6 +7,8 @@ import { SITE_NAME } from '@/lib/website/metadata'
 import type { WebsitePage } from '@/lib/website/load'
 import type { Service } from '@/payload-types'
 import { buttonClass, CmsLink } from './cms-link'
+import { HeroCurrent } from './hero-current'
+import { HeroLandscape } from './hero-landscape'
 import { HeroMap } from './hero-map'
 import { HeroScene } from './hero-scene'
 import styles from './hero.module.css'
@@ -71,17 +73,7 @@ function ServiceNode({ service, slot }: { service: Service; slot?: number }) {
     } as CSSProperties)
   return (
     <li className={branch ? styles.node : undefined} data-slot={slot} style={position}>
-      {branch && (
-        <svg className={styles.current} fill="none" aria-hidden="true">
-          <defs>
-            <path id={`hero-current-${slot}`} />
-          </defs>
-          <use href={`#hero-current-${slot}`} className={styles.thread} />
-          <path className={styles.filament} />
-          <use href={`#hero-current-${slot}`} className={styles.beads} />
-          <use data-knot="" href={`#hero-current-${slot}`} className={styles.knot} />
-        </svg>
-      )}
+      {branch && <HeroCurrent id={`hero-current-${slot}`} />}
       <Link data-glass-service="" className={styles.service} href={servicePath(service.slug)}>
         <span className={styles.icon}>
           <ServiceIcon slug={service.slug} />
@@ -114,16 +106,7 @@ export async function Hero({
           customArtwork ? (
             <ResponsiveImage media={customArtwork} priority sizes="100vw" alt="" />
           ) : (
-            <picture>
-              <source media="(max-width: 639px)" srcSet="/hero/rhine-landscape-phone.webp" />
-              <img
-                src="/hero/rhine-landscape-wide.webp"
-                width="1600"
-                height="680"
-                alt=""
-                fetchPriority="high"
-              />
-            </picture>
+            <HeroLandscape />
           )
         }
       >

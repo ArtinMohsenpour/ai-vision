@@ -1,15 +1,18 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Fragment, Suspense, useActionState, useEffect, useMemo, useState } from 'react'
 
 import { buttonClass } from '@/components/site/cms-link'
+import { useCustomerStatus } from '@/components/site/use-customer-session'
 import { Link } from '@/i18n/navigation'
+import { orderPath } from '@/lib/pages'
 import type { CheckoutState } from '@/lib/shop/checkout-state'
 import { formatEuros } from '@/lib/shop/money'
 import { displayConfig, type OrderPageData } from '@/lib/shop/order-page'
 import { parseExtraIds, quoteOrder, vatFor } from '@/lib/shop/pricing'
+import { readSelection, saveSelection } from '@/lib/shop/saved-selection'
 import { ExtraIcon } from './extra-icons'
 import { ExtraPreview } from './extra-preview'
 
@@ -21,7 +24,7 @@ type Props = {
 /** Reads the selection from `?extras=` so the page itself stays static and cached. */
 export function OrderConfigurator(props: Props) {
   return (
-    <Suspense fallback={<Configurator {...props} initial={[]} />}>
+    <Suspense fallback={<Configurator {...props} initial={[]} fromUrl />}>
       <ConfiguratorFromUrl {...props} />
     </Suspense>
   )
@@ -31,10 +34,15 @@ function ConfiguratorFromUrl(props: Props) {
   const params = useSearchParams()
   const known = new Set(props.data.extras.map((extra) => extra.id))
   const initial = parseExtraIds(params.get('extras')).filter((id) => known.has(id))
-  return <Configurator {...props} initial={initial} />
+  return <Configurator {...props} initial={initial} fromUrl={params.has('extras')} />
 }
 
-function Configurator({ data, action, initial }: Props & { initial: string[] }) {
+function Configurator({
+  data,
+  action,
+  initial,
+  fromUrl,
+}: Props & { initial: string[]; fromUrl: boolean }) {
   const t = useTranslations('Shop')
   const locale = useLocale() === 'de' ? 'de' : 'en'
   const [state, formAction, pending] = useActionState(action, {})
@@ -47,11 +55,42 @@ function Configurator({ data, action, initial }: Props & { initial: string[] }) 
     if (state.error === 'offerChanged') router.refresh()
   }, [state, router])
   const [focused, setFocused] = useState<string | undefined>(initial[0] ?? data.extras[0]?.id)
+  // null while the session check runs, so signed-in customers never see the sign-in step flash.
+  const signedIn = useCustomerStatus(usePathname())
+
+  // Without `?extras=` in the link, bring back what this browser saved for this service.
+  useEffect(() => {
+    if (fromUrl) return
+    const saved = readSelection(
+      data.slug,
+      data.extras.map((extra) => extra.id),
+    )
+    if (!saved.length) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restoring from browser storage after hydration
+    setSelected(saved)
+    setFocused(saved[0])
+    replaceExtrasInUrl(saved)
+    // Only on arrival; later changes are saved below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const config = useMemo(() => displayConfig(data), [data])
   const quote = quoteOrder(config, selected, data.vatRate)
   const euros = (cents: number) => formatEuros(cents, locale)
   const focusedExtra = data.extras.find((extra) => extra.id === focused)
   const extrasParam = quote.lines.flatMap((line) => (line.id ? [line.id] : [])).join(',')
+  // Where sign-in and sign-up send the customer back to, with this exact selection.
+  const returnPath = `${orderPath(data.slug)}${extrasParam ? `?extras=${extrasParam}` : ''}`
+
+  useEffect(() => {
+    saveSelection(data.slug, extrasParam ? extrasParam.split(',') : [])
+  }, [data.slug, extrasParam])
+
+  function replaceExtrasInUrl(ids: string[]) {
+    const url = new URL(window.location.href)
+    if (ids.length) url.searchParams.set('extras', ids.join(','))
+    else url.searchParams.delete('extras')
+    window.history.replaceState(null, '', url)
+  }
 
   function toggle(id: string) {
     const next =
@@ -62,11 +101,9 @@ function Configurator({ data, action, initial }: Props & { initial: string[] }) 
           : [...selected, id]
     setSelected(next)
     setFocused(id)
-    const url = new URL(window.location.href)
-    const ordered = data.extras.filter((extra) => next.includes(extra.id)).map((extra) => extra.id)
-    if (ordered.length) url.searchParams.set('extras', ordered.join(','))
-    else url.searchParams.delete('extras')
-    window.history.replaceState(null, '', url)
+    replaceExtrasInUrl(
+      data.extras.filter((extra) => next.includes(extra.id)).map((extra) => extra.id),
+    )
   }
 
   const dueNow = quote.depositPercent
@@ -241,43 +278,64 @@ function Configurator({ data, action, initial }: Props & { initial: string[] }) 
             {quote.depositPercent > 0 && <p className="mt-2 text-xs text-muted">{t('dueLater')}</p>}
             {data.priceNote && <p className="mt-2 text-xs text-muted">{data.priceNote}</p>}
 
-            <form action={formAction} className="mt-5">
-              <input type="hidden" name="extras" value={extrasParam} />
-              <label className="flex cursor-pointer gap-2.5 text-sm">
-                <input
-                  type="checkbox"
-                  name="terms"
-                  value="accepted"
-                  required
-                  className="mt-0.5 size-4 shrink-0 accent-primary"
-                />
-                <span>
-                  {t.rich('terms', {
-                    link: (chunks) => (
-                      <Link
-                        href="/terms"
-                        target="_blank"
-                        className="font-medium underline underline-offset-2"
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                  })}
-                </span>
-              </label>
-              {state.error && (
-                <p role="alert" className="mt-3 text-sm text-[var(--error-text)]">
-                  {t(`errors.${state.error}`)}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={pending}
-                className={`mt-4 w-full ${buttonClass('primary')} py-3 disabled:opacity-60`}
-              >
-                {pending ? t('redirecting') : t('continue')}
-              </button>
-            </form>
+            {signedIn === false ? (
+              <div className="mt-5 rounded-2xl bg-accent p-4" data-sign-in-step="">
+                <p className="font-semibold">{t('signInTitle')}</p>
+                <p className="mt-1 text-sm text-muted">{t('signInBody')}</p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <Link
+                    href={{ pathname: '/login', query: { next: returnPath } }}
+                    className={`${buttonClass('primary')} py-3`}
+                  >
+                    {t('signIn')}
+                  </Link>
+                  <Link
+                    href={{ pathname: '/signup', query: { next: returnPath } }}
+                    className={`${buttonClass('secondary')} py-3`}
+                  >
+                    {t('createAccount')}
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <form action={formAction} className="mt-5">
+                <input type="hidden" name="extras" value={extrasParam} />
+                <label className="flex cursor-pointer gap-2.5 text-sm">
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    value="accepted"
+                    required
+                    className="mt-0.5 size-4 shrink-0 accent-primary"
+                  />
+                  <span>
+                    {t.rich('terms', {
+                      link: (chunks) => (
+                        <Link
+                          href="/terms"
+                          target="_blank"
+                          className="font-medium underline underline-offset-2"
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </span>
+                </label>
+                {state.error && (
+                  <p role="alert" className="mt-3 text-sm text-[var(--error-text)]">
+                    {t(`errors.${state.error}`)}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className={`mt-4 w-full ${buttonClass('primary')} py-3 disabled:opacity-60`}
+                >
+                  {pending ? t('redirecting') : t('continue')}
+                </button>
+              </form>
+            )}
             <p className="mt-3 flex gap-2 text-xs leading-relaxed text-muted">
               <svg
                 aria-hidden="true"

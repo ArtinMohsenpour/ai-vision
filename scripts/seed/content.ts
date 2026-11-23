@@ -3,6 +3,7 @@
  * arrays have the same structure in each locale. No prices, contact details, client names or
  * legal texts are invented: those must come from the company and are marked as placeholders.
  */
+import { initialServiceHeroFeatures } from '../../src/migrations/data/service-hero-features'
 import {
   action,
   buttons,
@@ -122,6 +123,7 @@ export function serviceData(seed: (typeof serviceSeeds)[number], locale: Locale)
     slug: seed.slug,
     sortOrder: seed.sortOrder,
     title: copy.title,
+    heroFeatures: initialServiceHeroFeatures[seed.slug].map(([de, en]) => ({ label: t(de, en) })),
     summary: copy.summary,
     keyPoints: copy.points.map((point) => ({ text: point })),
     sections: [

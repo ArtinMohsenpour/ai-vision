@@ -1,15 +1,13 @@
 import { randomUUID } from 'node:crypto'
-import { readFile, readdir } from 'node:fs/promises'
-import { join } from 'node:path'
 import { expect, test as base } from '@playwright/test'
 import { Secret, TOTP } from 'otpauth'
 
+import { linkFromMail } from '../helpers/mail'
 import { getLocalTestPayload } from '../helpers/seedUser'
 
 const origin = new URL(
   process.env.RHEINO_TEST_ORIGIN || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
 ).origin
-const outbox = process.env.RHEINO_LOCAL_MAIL_DIR || join(process.cwd(), '.next', 'customer-mail')
 
 const test = base.extend<{ trackCustomer: (email: string) => string }>({
   trackCustomer: async ({ baseURL }, provide) => {
@@ -42,31 +40,6 @@ const test = base.extend<{ trackCustomer: (email: string) => string }>({
     }
   },
 })
-
-async function linkFromMail(address: string, path: string) {
-  const extractLink = (html?: string) => {
-    const href = html?.match(/href="([^"]+)"/)?.[1]
-    return href && new URL(href).pathname === path ? href : ''
-  }
-  if (process.env.RHEINO_MAILPIT === '1') {
-    const inbox = new URL('http://127.0.0.1:8025/view/latest.html')
-    inbox.searchParams.set('query', `to:${address}`)
-    const response = await fetch(inbox)
-    return response.ok ? extractLink(await response.text()) : ''
-  }
-  const files = await readdir(outbox).catch(() => [])
-  for (const file of files.sort().reverse()) {
-    if (!file.endsWith('.json')) continue
-    const mail = JSON.parse(await readFile(join(outbox, file), 'utf8')) as {
-      to?: string
-      html?: string
-    }
-    if (mail.to !== address) continue
-    const href = extractLink(mail.html)
-    if (href) return href
-  }
-  return ''
-}
 
 test('verifies a new account, revokes sessions on reset, and signs out', async ({
   page,

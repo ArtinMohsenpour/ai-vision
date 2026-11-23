@@ -278,8 +278,16 @@ test.describe('Frontend', () => {
     await expect(header).not.toHaveCSS('background-color', clear)
     await page.evaluate(() => scrollTo(0, 0))
     await expect(header).toHaveCSS('background-color', clear)
-    // Pages without the hero keep the frosted bar.
+    // Service detail pages use a full hero and the services overview uses a landscape band.
     await page.goto('/en/services/websites')
+    expect((await page.locator('[data-service-hero] img').boundingBox())?.y).toBe(0)
+    await expect(header).toHaveCSS('background-color', clear)
+    await page.goto('/en/services')
+    await expect(page.locator('[data-page-band]')).toHaveCount(1)
+    await expect(header).toHaveCSS('background-color', clear)
+    // Legal pages have no band and keep the frosted bar.
+    await page.goto('/en/impressum')
+    await expect(page.locator('[data-page-band]')).toHaveCount(0)
     await expect(header).not.toHaveCSS('background-color', clear)
   })
 })

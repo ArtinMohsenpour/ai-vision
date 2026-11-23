@@ -205,6 +205,52 @@ describe('website content access', () => {
       expect(visitor.totalDocs).toBe(1)
     })
 
+    it('limits hero features to eight in drafts and on publish and supports translated edits', async () => {
+      const heroFeatures = Array.from({ length: 8 }, (_, index) => ({ label: `Merkmal ${index + 1}` }))
+      const data = serviceData(`test-${stamp}-hero`, 'published')
+      const created = await payload.create({
+        collection: 'services',
+        locale: 'de',
+        data: { ...data, heroFeatures },
+      })
+      const tooMany = [...heroFeatures, { label: 'Neuntes Merkmal' }]
+      for (const draft of [true, false]) {
+        await expect(
+          payload.update({
+            collection: 'services',
+            id: created.id,
+            draft,
+            data: { heroFeatures: tooMany },
+          }),
+        ).rejects.toMatchObject({
+          data: { errors: [expect.objectContaining({ path: 'heroFeatures' })] },
+        })
+      }
+
+      const reordered = [created.heroFeatures![7], created.heroFeatures![0]]
+      const saved = await payload.update({
+        collection: 'services',
+        id: created.id,
+        locale: 'en',
+        data: {
+          _status: 'published',
+          title: 'Test service in English',
+          summary: 'Test summary in English',
+          heroFeatures: reordered.map(({ id }, index) => ({ id, label: `Feature ${index + 1}` })),
+        },
+      })
+      expect(saved.heroFeatures?.map(({ label }) => label)).toEqual(['Feature 1', 'Feature 2'])
+      const german = await payload.findByID({ collection: 'services', id: created.id, locale: 'de' })
+      expect(german.heroFeatures?.map(({ label }) => label)).toEqual(['Merkmal 8', 'Merkmal 1'])
+
+      const cleared = await payload.update({
+        collection: 'services',
+        id: created.id,
+        data: { heroFeatures: [], _status: 'published' },
+      })
+      expect(cleared.heroFeatures).toEqual([])
+    })
+
     it('a customer cannot delete a service page', async () => {
       const { docs } = await payload.find({ collection: 'services', limit: 1 })
       await expect(

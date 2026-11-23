@@ -1,0 +1,45 @@
+/*
+ * A faint, still Rhine landscape behind the navbar and heading of marketing pages. Home keeps the
+ * full hero with the video. Strength: --band-opacity (light and dark theme).
+ */
+.band {
+  --band-opacity: 0.3;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: clamp(19rem, 44vh, 28rem);
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black 0% 45%, transparent 100%);
+}
+
+.band img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+  opacity: var(--band-opacity);
+}
+
+/* Soft haze in the page colour keeps headings and subtitles readable. */
+.band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 38%,
+    color-mix(in srgb, var(--background) 55%, transparent),
+    transparent 70%
+  );
+}
+
+/* Dark theme: chosen in the theme switcher, or the system setting when nothing is chosen. */
+:global(:root[data-theme='dark']) .band {
+  --band-opacity: 0.36;
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .band {
+    --band-opacity: 0.36;
+  }
+}

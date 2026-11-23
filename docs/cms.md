@@ -46,14 +46,19 @@ An unpublished page returns 404, except Home, which shows a short placeholder fr
 3. **Content**: add sections and choose **100%**, **50% / 50%** or **33% / 33% / 33%**. Each column holds content items:
    - **Rich text**: headings H2–H4, lists, quotes, bold, italic, links. Local links like `/about` get `/en` on English pages.
    - **Image** from the media library, with original, 4:3 or square crop and a caption.
-   - **Cards**: short highlights, optionally numbered for process steps.
+   - **Cards**: short highlights, optionally numbered for process steps, or each with an icon (feature grid). Four or eight cards sit in rows of four on large screens.
+   - **Timeline (steps)**: 2–8 process steps with an optional short note ("online"), joined by a line. Vertical on phones and in narrow columns, horizontal on large screens in a full-width section (up to six steps).
+   - **Key facts**: 2–4 short values with a label ("1 year · Domain and hosting included"). Use real facts only.
    - **FAQ**: expandable questions, also published as schema.org `FAQPage` data.
+   - **Package and price**: pick a service; shows the live base package, "from" price, delivery days, included points and (optionally) the extras with prices, all read from that service's Ordering tab, so prices are never typed into the page. "Show": package with extras, package only, or price and button only (for a closing call to action). The button is "Configure and order" while online ordering is open, otherwise a contact button with a "closed" note; quote services show "Price on request". Code: `src/components/site/offer.tsx`, `src/lib/shop/offer.ts`.
    - **Service cards**: chosen service pages, or all published ones when left empty.
    - **Buttons**: up to three links styled as primary or secondary buttons.
 4. **SEO**: optional title, description, sharing image and "hide from search engines". Canonical and `de`/`en` alternate URLs are generated.
 5. **Save draft** while editing, then **Publish**. The last 25 versions are kept. Published changes show on the next page load.
 
 Sections belong to one language: English sections are separate from German ones. Until English sections exist, English pages show the German sections.
+
+On a service page, open **Heading → Hero features** to edit, reorder, add or remove up to eight branches around the page title. Use the locale selector to translate each label. The branch list and order are shared by both languages. Leave the list empty for a hero with just the page title.
 
 ## Links
 

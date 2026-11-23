@@ -11,6 +11,7 @@ import * as migration_20261120_140000_customer_mfa from './20261120_140000_custo
 import * as migration_20261120_140001_customer_session_grants from './20261120_140001_customer_session_grants';
 import * as migration_20261120_153646_shop_ordering from './20261120_153646_shop_ordering';
 import * as migration_20261120_154407_shop_orders from './20261120_154407_shop_orders';
+import * as migration_20261123_092611_service_hero_features from './20261123_092611_service_hero_features';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20261120_154407_shop_orders.up,
     down: migration_20261120_154407_shop_orders.down,
-    name: '20261120_154407_shop_orders'
+    name: '20261120_154407_shop_orders',
+  },
+  {
+    up: migration_20261123_092611_service_hero_features.up,
+    down: migration_20261123_092611_service_hero_features.down,
+    name: '20261123_092611_service_hero_features'
   },
 ];

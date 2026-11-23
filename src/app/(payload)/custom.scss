@@ -21,6 +21,25 @@
     min-height: 36px;
   }
 
+  // Header breadcrumb ("Service pages / <document title>"): Payload lets it grow past the screen,
+  // so a long title pushed the language switch and the account link off screen and the whole
+  // edit page scrolled sideways. Let the breadcrumb scroll on its own instead (Payload already
+  // fades its right edge). Not on the dashboard: its breadcrumb holds a dropdown that a scroll
+  // container would cut off.
+  .app-header__step-nav-wrapper:not(
+      :has(.dashboard-breadcrumb-select, .dashboard-breadcrumb-dropdown__editing)
+    ) {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  // Account page: the divider lines above and below the language/theme settings run from
+  // gutter to gutter, not past the right edge of the screen.
+  .payload-settings::before,
+  .payload-settings::after {
+    width: calc(100% + var(--gutter-h) * 2);
+  }
+
   // Prevent iOS from zooming into inputs (it zooms when the font is below 16px).
   input,
   textarea,

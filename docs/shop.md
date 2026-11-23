@@ -41,6 +41,7 @@ Snapshot, Stripe payments and billing details are read-only. A customer with ord
 ## What customers see
 
 - `/pricing`: every service with ordering open (and quote services) with its "from" price.
+- Any page with a **Package and price** content item (`docs/cms.md`): the live base package, extras and prices of the chosen service, with the order button while ordering is open.
 - `/services/<slug>/order`: the configurator with preview, live total and delivery estimate. The selection stays in the URL (`?extras=…`), so it survives login and sign-up (including email verification).
 - `/account/orders`: their orders; `/account/orders/<id>`: details, payments, billing details and the balance button.
 - The site says: "Secure payment by Stripe. Your card details go straight to Stripe. We never see or store them." Rheino stores the account and the order, never card or bank details.

@@ -56,12 +56,14 @@ export function HeroScene({
   children,
   landscape,
   animateLandscape,
+  animateConnections = true,
   pauseLabel,
   playLabel,
 }: {
   children: ReactNode
   landscape: ReactNode
   animateLandscape: boolean
+  animateConnections?: boolean
   pauseLabel: string
   playLabel: string
 }) {
@@ -73,17 +75,19 @@ export function HeroScene({
         {animateLandscape && <LandscapeVideo paused={paused} />}
       </div>
       {children}
-      <button
-        type="button"
-        className={styles.motion}
-        aria-label={paused ? playLabel : pauseLabel}
-        title={paused ? playLabel : pauseLabel}
-        onClick={() => setPaused(!paused)}
-      >
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d={paused ? 'M7 4v16l13-8z' : 'M6 4h4v16H6zm8 0h4v16h-4z'} />
-        </svg>
-      </button>
+      {(animateConnections || animateLandscape) && (
+        <button
+          type="button"
+          className={styles.motion}
+          aria-label={paused ? playLabel : pauseLabel}
+          title={paused ? playLabel : pauseLabel}
+          onClick={() => setPaused(!paused)}
+        >
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d={paused ? 'M7 4v16l13-8z' : 'M6 4h4v16H6zm8 0h4v16h-4z'} />
+          </svg>
+        </button>
+      )}
     </div>
   )
 }

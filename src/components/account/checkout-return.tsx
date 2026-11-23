@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { clearSelection } from '@/lib/shop/saved-selection'
+
 const INTERVAL = 3_000
 const ATTEMPTS = 20
 
@@ -11,10 +13,21 @@ const ATTEMPTS = 20
  * Shown after the redirect back from Stripe. The redirect itself changes nothing: the page
  * re-reads the order until the webhook has confirmed the payment.
  */
-export function CheckoutReturn({ paid }: { paid: boolean }) {
+export function CheckoutReturn({
+  paid,
+  serviceSlug,
+}: {
+  paid: boolean
+  serviceSlug?: string | null
+}) {
   const t = useTranslations('CustomerPortal')
   const router = useRouter()
   const [attempts, setAttempts] = useState(0)
+
+  // Paid: the saved selection on the order page has done its job.
+  useEffect(() => {
+    if (paid && serviceSlug) clearSelection(serviceSlug)
+  }, [paid, serviceSlug])
 
   useEffect(() => {
     if (paid || attempts >= ATTEMPTS) return

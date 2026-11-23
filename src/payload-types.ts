@@ -12,7 +12,7 @@
  */
 export type ContentItem =
   | {
-      type: 'text' | 'image' | 'cards' | 'faq' | 'services' | 'buttons';
+      type: 'text' | 'image' | 'cards' | 'steps' | 'facts' | 'faq' | 'offer' | 'services' | 'buttons';
       text?: {
         root: {
           type: string;
@@ -38,10 +38,76 @@ export type ContentItem =
         | {
             title: string;
             text?: string | null;
+            /**
+             * Optional. Shown above the title; numbered cards show the number instead.
+             */
+            icon?:
+              | (
+                  | 'website'
+                  | 'speed'
+                  | 'mobile'
+                  | 'edit'
+                  | 'search'
+                  | 'shield'
+                  | 'lock'
+                  | 'language'
+                  | 'accessibility'
+                  | 'design'
+                  | 'cms'
+                  | 'payment'
+                  | 'chatbot'
+                  | 'sparkles'
+                  | 'automation'
+                  | 'analytics'
+                  | 'code'
+                  | 'server'
+                  | 'calendar'
+                  | 'clock'
+                  | 'mail'
+                  | 'location'
+                  | 'support'
+                  | 'people'
+                  | 'shop'
+                  | 'restaurant'
+                  | 'tools'
+                  | 'briefcase'
+                  | 'launch'
+                  | 'check'
+                )
+              | null;
             id?: string | null;
           }[]
         | null;
       numbered?: boolean | null;
+      /**
+       * Process steps in order, shown as a connected timeline.
+       */
+      steps?:
+        | {
+            title: string;
+            text?: string | null;
+            /**
+             * Optional short label next to the step, for example "online".
+             */
+            note?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * A row of short values with a label, for example "DE · EN" and "Two languages". Use real facts only.
+       */
+      facts?:
+        | {
+            value: string;
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Shows the live base price, included points, delivery time and extras from this service's Ordering tab, with its order button. While online ordering is closed, a contact button replaces it.
+       */
+      offerService?: (number | null) | Service;
+      offerLayout?: ('extras' | 'package' | 'compact') | null;
       /**
        * Shown as expandable questions and published as FAQ data for search engines.
        */
@@ -355,6 +421,15 @@ export interface Service {
   sortOrder: number;
   title: string;
   /**
+   * Up to eight short labels around the service title. Translate each label with the language selector. The list and its order are shared across languages.
+   */
+  heroFeatures?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Lead paragraph and card text.
    */
   summary: string;
@@ -365,7 +440,7 @@ export interface Service {
       }[]
     | null;
   /**
-   * Optional image next to the heading and on the service card.
+   * Optional image next to the summary and on the service card.
    */
   image?: (number | null) | Media;
   /**
@@ -796,6 +871,12 @@ export interface ServicesSelect<T extends boolean = true> {
   slug?: T;
   sortOrder?: T;
   title?: T;
+  heroFeatures?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
   summary?: T;
   keyPoints?:
     | T

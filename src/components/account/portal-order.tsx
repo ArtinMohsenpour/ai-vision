@@ -60,7 +60,10 @@ export async function PortalOrder({
   return (
     <section className={styles.card} aria-labelledby="order-heading">
       {returning && (
-        <CheckoutReturn paid={order.paymentStatus !== 'unpaid' && !awaitingStripe(order)} />
+        <CheckoutReturn
+          paid={order.paymentStatus !== 'unpaid' && !awaitingStripe(order)}
+          serviceSlug={snapshot.serviceSlug}
+        />
       )}
       <Link href="/account/orders" className="text-sm text-muted hover:text-foreground">
         ← {t('backToOrders')}

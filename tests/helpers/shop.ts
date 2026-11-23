@@ -19,6 +19,10 @@ export async function shopFixture(request: APIRequestContext) {
   expect(login.ok()).toBe(true)
   const headers = { Authorization: `JWT ${(await login.json()).token as string}` }
   const previous: ShopSetting = await payload.findGlobal({ slug: 'shop-settings' })
+  // The price note is localized; tests write the English one, so restore exactly that.
+  const previousNote =
+    (await payload.findGlobal({ slug: 'shop-settings', locale: 'en', fallbackLocale: false }))
+      .priceNote ?? null
   const services: number[] = []
 
   async function settings(
@@ -65,6 +69,7 @@ export async function shopFixture(request: APIRequestContext) {
       await settings({
         orderingEnabled: previous.orderingEnabled ?? false,
         vatRate: previous.vatRate ?? '0',
+        priceNote: previousNote,
       })
       await payload.delete({ collection: 'users', id: admin.id })
     } finally {

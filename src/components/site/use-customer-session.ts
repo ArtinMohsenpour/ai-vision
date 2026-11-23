@@ -2,8 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+/** True once the site knows a customer is signed in (false while unknown or signed out). */
 export function useCustomerSession(pathname: string) {
-  const [authenticated, setAuthenticated] = useState(false)
+  return useCustomerStatus(pathname) === true
+}
+
+/** null until the first check finishes, then whether a customer is signed in. */
+export function useCustomerStatus(pathname: string) {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null)
   const lastStatus = useRef<boolean | null>(null)
 
   useEffect(() => {

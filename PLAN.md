@@ -66,7 +66,7 @@ Every fixed website page is its own global, with its own editor in the admin sid
 | `case-studies` | Not built yet: title, client type, problem, solution, results, images, related service                                                       |
 | `media`        | File, alt text (localized). Public images only: PNG/JPEG are converted to WebP on upload (only WebP stored), SVG kept; WebP sizes 400/768/1600 px |
 
-Page sections are blocks (full width, two columns, three columns) stored as JSONB (`blocksAsJSON`). Each column holds content items: rich text, image, cards, FAQ, service cards and buttons. Sections are localized per language; English falls back to German.
+Page sections are blocks (full width, two columns, three columns) stored as JSONB (`blocksAsJSON`). Each column holds content items: rich text, image, cards (optionally with icons), timeline, key facts, FAQ, package and price (live from a service's Ordering tab), service cards and buttons. New content items need no migration because sections are JSON. Sections are localized per language; English falls back to German.
 
 ### Shop collections
 
