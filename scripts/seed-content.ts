@@ -70,7 +70,7 @@ async function seedServices(payload: Payload) {
         collection: 'services',
         id: created.id,
         locale: 'en',
-        data: { ...serviceData(seed, 'en'), _status: 'published' } as never,
+        data: { ...(withRowIds(created, serviceData(seed, 'en')) as Row), _status: 'published' } as never,
       })
     }
     payload.logger.info(`Published ${serviceSeeds.length} service pages.`)

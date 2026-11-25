@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Order page mockup</title>
+<!-- Approved layout reference for the order page (2026-11-20). Colors here are mockup-only; the real page uses the tokens in src/app/(frontend)/globals.css. -->
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#fbfaf8,#0f1110);--fg:light-dark(#171a16,#eceee9);--muted:light-dark(#5d6259,#a2a79e);--border:light-dark(#e4e2db,#272b28);--surface:light-dark(#fff,#171a18);--accent:light-dark(#e7f0ec,#1a2924);--primary:light-dark(#2a6a59,#7cc4ac);--on-primary:light-dark(#fff,#0b1a14)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
+main{max-width:960px;margin:0 auto;padding:32px 16px}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.base{padding:16px;border-radius:14px;background:var(--accent);margin-bottom:16px}
+.ex{display:flex;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.ex.on{border:2px solid var(--primary);padding:11px 13px}
+.box{width:18px;height:18px;border-radius:5px;border:1px solid var(--muted);flex-shrink:0;margin-top:3px;display:grid;place-items:center;color:transparent;font-size:12px}
+.ex.on .box{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.lbl{font-size:12px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;font-size:14px;padding:3px 0}
+.art{height:130px;background:var(--accent);display:grid;place-items:center;border-bottom:1px solid var(--border);border-radius:14px 14px 0 0;color:var(--muted)}
+button{width:100%;height:44px;border:0;border-radius:10px;background:var(--primary);color:var(--on-primary);font:inherit;font-weight:600;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<div class="lbl">Pricing / Website</div>
+<h1 style="margin:4px 0">Build your website</h1>
+<p style="color:var(--muted);margin-top:0">Start with the base package and add what your business needs.</p>
+<div class="grid">
+<div>
+<div class="base">
+<div class="row" style="font-size:16px;font-weight:600"><span>Simple website</span><span>€200</span></div>
+<div style="font-size:14px;color:var(--muted)">Up to 5 pages, mobile ready, contact form, SEO basics. Ready in 7 days.</div>
+<div class="lbl" style="margin-top:6px">✓ Included in every order</div>
+</div>
+<div class="lbl" style="margin-bottom:8px">Extras</div>
+<div id="list"></div>
+</div>
+<div>
+<div class="card" style="margin-bottom:12px">
+<div class="art" id="art"></div>
+<div style="padding:12px 14px">
+<div class="lbl">Preview</div>
+<div id="pt" style="font-weight:600"></div>
+<div id="pd" style="font-size:14px;color:var(--muted);margin:4px 0 8px"></div>
+<div id="pl" style="font-size:14px"></div>
+</div>
+</div>
+<div class="card" style="padding:12px 14px">
+<div class="lbl">Your order</div>
+<div class="row"><span>Simple website</span><span>€200</span></div>
+<div id="sum"></div>
+<div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px">
+<div class="row" style="font-size:16px;font-weight:600"><span>Total</span><span id="total"></span></div>
+<div class="row" style="color:var(--muted)"><span>Estimated delivery</span><span id="days"></span></div>
+<div class="lbl">Price note from shop settings</div>
+</div>
+<label style="display:flex;gap:8px;font-size:13px;margin-top:10px"><input type="checkbox" /> I order as a business and accept the terms (AGB)</label>
+<button type="button">Continue to payment →</button>
+<p class="lbl" style="margin:8px 0 0">🔒 Secure payment by Stripe. Your card details go straight to Stripe. We never see or store them.</p>
+</div>
+</div>
+</div>
+</main>
+<script>
+const X=[
+{id:'cms',t:'CMS',p:350,d:5,s:'Edit texts, images and pages yourself.',desc:'An easy admin area where you change content without a developer.',g:['Edit every text and image','Add new pages and blog posts','German and English content','Drafts and version history']},
+{id:'portal',t:'Customer portal',p:900,d:10,s:'Accounts and logins for your customers.',desc:'Your customers sign up, log in and see their own data in a private area.',g:['Sign-up, login and password reset','Profile and company details','Private customer dashboard','Admin view of all customers']},
+{id:'chat',t:'AI chatbot',p:450,d:4,s:'Answers visitor questions 24/7.',desc:'A chat assistant trained on your services that answers questions and collects leads.',g:['Trained on your content','Hands over to you by email','German and English','Monthly usage report']},
+{id:'pay',t:'Payment page',p:300,d:3,s:'Take card payments online.',desc:'Sell products or services with secure online payments through Stripe.',g:['Card, Apple Pay, Google Pay','Order emails to you and the buyer','Stripe dashboard for refunds','No card data on your server']}];
+const on=new Set(['cms']);let focus='cms';const eur=n=>'€'+n.toLocaleString('de-DE');
+function render(){
+list.innerHTML=X.map(x=>`<div class="card ex ${on.has(x.id)?'on':''}" data-id="${x.id}"><div class="box">✓</div><div style="flex:1"><div class="row" style="padding:0;font-size:15px;font-weight:600"><span>${x.t}</span><span>+${eur(x.p)}</span></div><div style="font-size:14px;color:var(--muted)">${x.s}</div><div class="lbl">+${x.d} days</div></div></div>`).join('');
+document.querySelectorAll('.ex').forEach(el=>el.onclick=()=>{const id=el.dataset.id;if(on.has(id)&&focus===id)on.delete(id);else on.add(id);focus=id;render()});
+const f=X.find(x=>x.id===focus);art.textContent='Image or icon from the admin';pt.textContent=f.t;pd.textContent=f.desc;pl.innerHTML=f.g.map(g=>`<div>✓ ${g}</div>`).join('');
+const s=X.filter(x=>on.has(x.id));sum.innerHTML=s.map(x=>`<div class="row" style="color:var(--muted)"><span>+ ${x.t}</span><span>${eur(x.p)}</span></div>`).join('');
+total.textContent=eur(200+s.reduce((a,x)=>a+x.p,0));days.textContent=(7+s.reduce((a,x)=>a+x.d,0))+' days';}
+render();
+</script>
+</body>
+</html>

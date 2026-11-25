@@ -27,3 +27,6 @@ export function websitePage(slug: string) {
 export const LOGIN_PATH = '/login'
 
 export const servicePath = (slug: string) => `/services/${slug}`
+
+/** The order page of a service that can be ordered online. */
+export const orderPath = (slug: string) => `/services/${slug}/order`

@@ -6,6 +6,7 @@ import type { EmailAdapter, PayloadRequest } from 'payload'
 
 import { localizedPath, type Locale } from '@/i18n/routing'
 import { SITE_NAME } from '@/lib/website/metadata'
+import { safeNextPath } from './next-path'
 
 const devMail = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
 const mailpit = process.env.NODE_ENV === 'development' && process.env.RHEINO_MAILPIT === '1'
@@ -136,6 +137,8 @@ export function customerEmail(kind: 'verify' | 'reset', req?: PayloadRequest, to
     typeof req.context?.customerOrigin === 'string' ? req.context.customerOrigin : null,
   )
   const url = new URL(localizedPath(locale, verify ? '/verify-email' : '/reset-password'), origin)
+  const next = verify ? safeNextPath(req.context?.customerNext) : null
+  if (next) url.searchParams.set('next', next)
   url.hash = verify ? verificationCode(req.payload.secret, token) : token
 
   return {

@@ -15,7 +15,7 @@ export async function PortalShell({
   locale,
   children,
 }: {
-  section: 'profile' | 'security'
+  section: 'profile' | 'security' | 'orders'
   user: Customer
   locale: Locale
   children: ReactNode
@@ -23,6 +23,7 @@ export async function PortalShell({
   const t = await getTranslations('CustomerPortal')
   const links = [
     { key: 'profile', href: '/account' },
+    { key: 'orders', href: '/account/orders' },
     { key: 'security', href: '/account/security' },
   ] as const
   const initials = `${Array.from(user.firstName)[0] ?? ''}${Array.from(user.lastName)[0] ?? ''}`

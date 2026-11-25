@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import type { ReactNode } from 'react'
 
 import { websitePage, type WebsiteLocale, type WebsitePageSlug } from '@/lib/pages'
 import { loadPage, loadServices, usesServiceCards, type WebsitePage } from '@/lib/website/load'
@@ -8,10 +9,21 @@ import { SITE_NAME, seoMetadata } from '@/lib/website/metadata'
 import { faqJsonLd } from '@/lib/website/structured-data'
 import { Hero } from './hero'
 import { JsonLd } from './json-ld'
+import { PageBand } from './page-band'
 import { PageHeading } from './page-heading'
 import { Sections } from './sections'
 
 export type PageProps = { params: Promise<{ locale: string }> }
+
+// Marketing pages get the faint landscape band; legal pages stay plain. Home has its own hero.
+const BAND_PAGES: ReadonlySet<WebsitePageSlug> = new Set([
+  'services-overview',
+  'pricing',
+  'about',
+  'how-it-works',
+  'faq',
+  'contact',
+])
 
 export async function websitePageMetadata(
   slug: WebsitePageSlug,
@@ -37,7 +49,13 @@ export async function WebsitePageView({
   slug,
   params,
   fallback,
-}: PageProps & { slug: WebsitePageSlug; fallback?: Partial<WebsitePage> }) {
+  afterHeading,
+}: PageProps & {
+  slug: WebsitePageSlug
+  fallback?: Partial<WebsitePage>
+  /** Rendered between the page heading and the sections, e.g. the pricing grid. */
+  afterHeading?: ReactNode
+}) {
   const locale = (await params).locale as WebsiteLocale
   // Lets next-intl render this page statically (no request headers needed).
   setRequestLocale(locale)
@@ -64,12 +82,14 @@ export async function WebsitePageView({
         </>
       ) : (
         <>
+          {BAND_PAGES.has(slug) && <PageBand />}
           <PageHeading
             eyebrow={page.eyebrow}
             title={page.title}
             subtitle={page.subtitle}
             actions={page.actions}
           />
+          {afterHeading}
           {sections}
         </>
       )}

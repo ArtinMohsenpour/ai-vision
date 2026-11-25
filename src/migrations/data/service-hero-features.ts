@@ -1,0 +1,51 @@
+// Initial bilingual copy for the service hero migration and fresh installs.
+export const initialServiceHeroFeatures = {
+  'ki-telefon-und-chat-assistenten': [
+    ['Rund um die Uhr erreichbar', 'Available around the clock'],
+    ['Telefon und Chat', 'Phone and chat'],
+    ['Antworten aus Ihrem Wissen', 'Answers from your own information'],
+    ['Terminbuchung', 'Appointment booking'],
+    ['Rückrufwünsche', 'Callback requests'],
+    ['Übergabe ans Team', 'Hands off to your team'],
+  ],
+  'ki-automatisierung': [
+    ['Weniger Routinearbeit', 'Less repetitive work'],
+    ['Bestehende Tools verbinden', 'Connects your existing tools'],
+    ['Automatische Datenübertragung', 'Automated data transfers'],
+    ['Rechnungsabläufe', 'Invoice workflows'],
+    ['Selbst gehostet möglich', 'Self-hosting available'],
+    ['Dokumentierte Workflows', 'Documented workflows'],
+  ],
+  websites: [
+    ['Schnelle Ladezeiten', 'Fast to load'],
+    ['Für Smartphones gemacht', 'Built for phones'],
+    ['Für Google optimiert', 'Easy for Google to read'],
+    ['Datensparsam', 'Privacy-friendly'],
+    ['Gut lesbar für alle', 'Readable for everyone'],
+    ['Wächst mit Ihrem Unternehmen', 'Grows with you'],
+  ],
+  'seo-und-ki-suche': [
+    ['Technischer SEO-Check', 'Technical SEO review'],
+    ['Sichtbarkeit bei Google', 'Visibility on Google'],
+    ['Lokale Suche', 'Local search'],
+    ['Einträge in Karten-Apps', 'Map listings'],
+    ['Inhalte für echte Fragen', 'Content that answers questions'],
+    ['Auffindbarkeit in KI-Suchen', 'Visibility in AI search'],
+  ],
+  'software-und-apps': [
+    ['Individuelle Web-Apps', 'Custom web apps'],
+    ['Interne Tools', 'Internal tools'],
+    ['Schnittstellen', 'Integrations'],
+    ['Klarer Projektumfang', 'Clear project scope'],
+    ['Schrittweise Umsetzung', 'Delivery in stages'],
+    ['Wartung nach dem Start', 'Maintenance after launch'],
+  ],
+  web3: [
+    ['Blockchain-Beratung', 'Blockchain consulting'],
+    ['Machbarkeitsprüfung', 'Feasibility assessment'],
+    ['Passende Anwendungsfälle', 'Use case evaluation'],
+    ['Blockchain-Anwendungen', 'Blockchain applications'],
+    ['Individueller Projektumfang', 'Custom project scope'],
+    ['Umsetzung nach Angebot', 'Development by quote'],
+  ],
+} satisfies Record<string, [de: string, en: string][]>

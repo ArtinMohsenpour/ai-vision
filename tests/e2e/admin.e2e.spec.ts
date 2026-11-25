@@ -114,3 +114,55 @@ test('allows the signed-in admin to edit accounts, change passwords, and delete 
     await payload.destroy()
   }
 })
+
+test('edits service prices in euros on a phone-sized screen', async ({ page, baseURL }) => {
+  test.setTimeout(60_000)
+  page.setDefaultTimeout(10_000)
+  await page.setViewportSize({ width: 375, height: 812 })
+  const payload = await getLocalTestPayload()
+  const owner = await seedTestUser(payload)
+  const service = await payload.create({
+    collection: 'services',
+    data: {
+      slug: `admin-prices-${randomUUID().slice(0, 8)}`,
+      sortOrder: 900,
+      title: 'Admin price test',
+      summary: 'Checks the euro price field.',
+      ordering: {
+        mode: 'order',
+        baseName: 'Simple website',
+        basePrice: 20000,
+        baseDays: 7,
+        extras: [{ title: 'CMS', price: 35000, days: 5 }],
+      },
+      _status: 'published',
+    },
+  })
+  try {
+    await login({ page, user: owner, serverURL: baseURL })
+    await page.goto(`/admin/collections/services/${service.id}`)
+    await page.getByRole('button', { name: 'Ordering', exact: true }).click()
+    const basePrice = page.locator('#field-ordering__basePrice')
+    await expect(basePrice).toHaveValue('200')
+    await basePrice.fill('1.200,50')
+    await basePrice.blur()
+    await expect(basePrice).toHaveValue('1.200,50')
+    await basePrice.fill('12,345')
+    await expect(page.getByRole('alert').filter({ hasText: 'Enter an amount like' })).toBeVisible()
+    await basePrice.fill('1.200,50')
+    const saved = page.waitForResponse(
+      (res) =>
+        res.request().method() === 'PATCH' &&
+        new URL(res.url()).pathname === `/api/services/${service.id}`,
+    )
+    await page.getByRole('button', { name: 'Publish changes' }).click()
+    expect((await saved).status()).toBe(200)
+    const stored = await payload.findByID({ collection: 'services', id: service.id })
+    expect(stored.ordering?.basePrice).toBe(120050)
+    expect(stored.ordering?.extras?.[0]?.price).toBe(35000)
+  } finally {
+    await payload.delete({ collection: 'services', id: service.id })
+    await payload.delete({ collection: 'users', id: owner.id })
+    await payload.destroy()
+  }
+})

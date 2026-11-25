@@ -3,14 +3,15 @@ import * as migration_20261118_123422_website_cms from './20261118_123422_websit
 import * as migration_20261118_130550_admin_names_and_media from './20261118_130550_admin_names_and_media';
 import * as migration_20261118_155018_internal_links from './20261118_155018_internal_links';
 import * as migration_20261118_162225_home_hero_artwork from './20261118_162225_home_hero_artwork';
-
-import * as rheivoHomeContent from './20261118_165720_rheivo_home_content';
-
-import * as dynamicFooterBrand from './20261119_000001_dynamic_footer_brand';
-import * as customerAuthLimits from './20261120_000001_customer_auth_limits';
-import * as optionalCustomerCompany from './20261120_113759_optional_customer_company';
-import * as customerMfa from './20261120_140000_customer_mfa';
-import * as customerSessionGrants from './20261120_140001_customer_session_grants';
+import * as migration_20261118_165720_rheivo_home_content from './20261118_165720_rheivo_home_content';
+import * as migration_20261119_000001_dynamic_footer_brand from './20261119_000001_dynamic_footer_brand';
+import * as migration_20261120_000001_customer_auth_limits from './20261120_000001_customer_auth_limits';
+import * as migration_20261120_113759_optional_customer_company from './20261120_113759_optional_customer_company';
+import * as migration_20261120_140000_customer_mfa from './20261120_140000_customer_mfa';
+import * as migration_20261120_140001_customer_session_grants from './20261120_140001_customer_session_grants';
+import * as migration_20261120_153646_shop_ordering from './20261120_153646_shop_ordering';
+import * as migration_20261120_154407_shop_orders from './20261120_154407_shop_orders';
+import * as migration_20261123_092611_service_hero_features from './20261123_092611_service_hero_features';
 
 export const migrations = [
   {
@@ -36,36 +37,51 @@ export const migrations = [
   {
     up: migration_20261118_162225_home_hero_artwork.up,
     down: migration_20261118_162225_home_hero_artwork.down,
-    name: '20261118_162225_home_hero_artwork'
+    name: '20261118_162225_home_hero_artwork',
   },
   {
-    up: rheivoHomeContent.up,
-    down: rheivoHomeContent.down,
+    up: migration_20261118_165720_rheivo_home_content.up,
+    down: migration_20261118_165720_rheivo_home_content.down,
     name: '20261118_165720_rheivo_home_content',
   },
   {
-    up: dynamicFooterBrand.up,
-    down: dynamicFooterBrand.down,
+    up: migration_20261119_000001_dynamic_footer_brand.up,
+    down: migration_20261119_000001_dynamic_footer_brand.down,
     name: '20261119_000001_dynamic_footer_brand',
   },
   {
-    up: customerAuthLimits.up,
-    down: customerAuthLimits.down,
+    up: migration_20261120_000001_customer_auth_limits.up,
+    down: migration_20261120_000001_customer_auth_limits.down,
     name: '20261120_000001_customer_auth_limits',
   },
   {
-    up: optionalCustomerCompany.up,
-    down: optionalCustomerCompany.down,
+    up: migration_20261120_113759_optional_customer_company.up,
+    down: migration_20261120_113759_optional_customer_company.down,
     name: '20261120_113759_optional_customer_company',
   },
   {
-    up: customerMfa.up,
-    down: customerMfa.down,
+    up: migration_20261120_140000_customer_mfa.up,
+    down: migration_20261120_140000_customer_mfa.down,
     name: '20261120_140000_customer_mfa',
   },
   {
-    up: customerSessionGrants.up,
-    down: customerSessionGrants.down,
+    up: migration_20261120_140001_customer_session_grants.up,
+    down: migration_20261120_140001_customer_session_grants.down,
     name: '20261120_140001_customer_session_grants',
+  },
+  {
+    up: migration_20261120_153646_shop_ordering.up,
+    down: migration_20261120_153646_shop_ordering.down,
+    name: '20261120_153646_shop_ordering',
+  },
+  {
+    up: migration_20261120_154407_shop_orders.up,
+    down: migration_20261120_154407_shop_orders.down,
+    name: '20261120_154407_shop_orders',
+  },
+  {
+    up: migration_20261123_092611_service_hero_features.up,
+    down: migration_20261123_092611_service_hero_features.down,
+    name: '20261123_092611_service_hero_features'
   },
 ];

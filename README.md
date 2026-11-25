@@ -5,6 +5,7 @@ Company website: Next.js 16 + Payload 3 + PostgreSQL 18, in German and English. 
 - Build plan: [`PLAN.md`](PLAN.md)
 - Rules for developers and AI tools: [`CLAUDE.md`](CLAUDE.md)
 - Editing pages, navigation and footer: [`docs/cms.md`](docs/cms.md)
+- Prices, ordering and Stripe payments (including the Stripe test setup): [`docs/shop.md`](docs/shop.md)
 
 ## Local setup
 

@@ -12,7 +12,7 @@
  */
 export type ContentItem =
   | {
-      type: 'text' | 'image' | 'cards' | 'faq' | 'services' | 'buttons';
+      type: 'text' | 'image' | 'cards' | 'steps' | 'facts' | 'faq' | 'offer' | 'services' | 'buttons';
       text?: {
         root: {
           type: string;
@@ -38,10 +38,76 @@ export type ContentItem =
         | {
             title: string;
             text?: string | null;
+            /**
+             * Optional. Shown above the title; numbered cards show the number instead.
+             */
+            icon?:
+              | (
+                  | 'website'
+                  | 'speed'
+                  | 'mobile'
+                  | 'edit'
+                  | 'search'
+                  | 'shield'
+                  | 'lock'
+                  | 'language'
+                  | 'accessibility'
+                  | 'design'
+                  | 'cms'
+                  | 'payment'
+                  | 'chatbot'
+                  | 'sparkles'
+                  | 'automation'
+                  | 'analytics'
+                  | 'code'
+                  | 'server'
+                  | 'calendar'
+                  | 'clock'
+                  | 'mail'
+                  | 'location'
+                  | 'support'
+                  | 'people'
+                  | 'shop'
+                  | 'restaurant'
+                  | 'tools'
+                  | 'briefcase'
+                  | 'launch'
+                  | 'check'
+                )
+              | null;
             id?: string | null;
           }[]
         | null;
       numbered?: boolean | null;
+      /**
+       * Process steps in order, shown as a connected timeline.
+       */
+      steps?:
+        | {
+            title: string;
+            text?: string | null;
+            /**
+             * Optional short label next to the step, for example "online".
+             */
+            note?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * A row of short values with a label, for example "DE · EN" and "Two languages". Use real facts only.
+       */
+      facts?:
+        | {
+            value: string;
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Shows the live base price, included points, delivery time and extras from this service's Ordering tab, with its order button. While online ordering is closed, a contact button replaces it.
+       */
+      offerService?: (number | null) | Service;
+      offerLayout?: ('extras' | 'package' | 'compact') | null;
       /**
        * Shown as expandable questions and published as FAQ data for search engines.
        */
@@ -169,7 +235,9 @@ export interface Config {
     services: Service;
     media: Media;
     customers: Customer;
+    orders: Order;
     users: User;
+    'stripe-events': StripeEvent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -180,7 +248,9 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'stripe-events': StripeEventsSelect<false> | StripeEventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -203,6 +273,7 @@ export interface Config {
     terms: Term;
     navbar: Navbar;
     footer: Footer;
+    'shop-settings': ShopSetting;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
@@ -217,6 +288,7 @@ export interface Config {
     terms: TermsSelect<false> | TermsSelect<true>;
     navbar: NavbarSelect<false> | NavbarSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'shop-settings': ShopSettingsSelect<false> | ShopSettingsSelect<true>;
   };
   locale: 'de' | 'en';
   widgets: {
@@ -349,6 +421,15 @@ export interface Service {
   sortOrder: number;
   title: string;
   /**
+   * Up to eight short labels around the service title. Translate each label with the language selector. The list and its order are shared across languages.
+   */
+  heroFeatures?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Lead paragraph and card text.
    */
   summary: string;
@@ -359,13 +440,89 @@ export interface Service {
       }[]
     | null;
   /**
-   * Optional image next to the heading and on the service card.
+   * Optional image next to the summary and on the service card.
    */
   image?: (number | null) | Media;
   /**
    * Add, reorder and reuse layouts. Columns stack in reading order on mobile. Each language has its own sections; English falls back to German until you add English sections.
    */
   sections?: (FullWidthSection | TwoColumnSection | ThreeColumnSection)[] | null;
+  ordering?: {
+    mode?: ('off' | 'order' | 'quote') | null;
+    /**
+     * For example "Simple website".
+     */
+    baseName?: string | null;
+    baseDescription?: string | null;
+    /**
+     * Short points, for example "Up to 5 pages".
+     */
+    baseIncludes?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    basePrice?: number | null;
+    /**
+     * For the base package alone.
+     */
+    baseDays?: number | null;
+    /**
+     * Optional. Empty, 0 or 100 means the customer pays everything at checkout.
+     */
+    depositPercent?: number | null;
+    /**
+     * Options the customer can add. Drag to reorder. Switch off "Active" to hide one without deleting it.
+     */
+    extras?:
+      | {
+          title: string;
+          /**
+           * One line under the title in the list.
+           */
+          summary?: string | null;
+          price?: number | null;
+          /**
+           * Added to the delivery time.
+           */
+          days?: number | null;
+          active?: boolean | null;
+          /**
+           * Shown in the preview panel when the customer looks at this extra.
+           */
+          description?: string | null;
+          /**
+           * Short points shown with check marks.
+           */
+          includes?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          /**
+           * Optional image or screenshot. Without one, the icon is shown.
+           */
+          image?: (number | null) | Media;
+          icon?:
+            | (
+                | 'cms'
+                | 'portal'
+                | 'chatbot'
+                | 'payment'
+                | 'seo'
+                | 'language'
+                | 'design'
+                | 'analytics'
+                | 'automation'
+                | 'generic'
+              )
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
   seo?: {
     /**
      * Optional. Falls back to the page title and the site name.
@@ -472,6 +629,101 @@ export interface Customer {
   collection: 'customers';
 }
 /**
+ * Created when a customer starts checkout. Payments are confirmed by Stripe. Edit the work status, request the remaining balance, record bank transfers and keep notes.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  number?: string | null;
+  status: 'awaiting_payment' | 'new' | 'in_progress' | 'delivered' | 'completed' | 'cancelled';
+  /**
+   * Set by Stripe payments and manual payments.
+   */
+  paymentStatus?: ('unpaid' | 'deposit_paid' | 'paid' | 'refunded' | 'partially_refunded') | null;
+  customer: number | Customer;
+  locale?: ('de' | 'en') | null;
+  amountPaid?: number | null;
+  balanceDue?: number | null;
+  amountRefunded?: number | null;
+  /**
+   * Turn on when the rest is due. The customer gets an email once and can pay from their account.
+   */
+  balanceRequested?: boolean | null;
+  balanceRequestedAt?: string | null;
+  /**
+   * For example a bank transfer. Updates the balance when saved.
+   */
+  manualPayments?:
+    | {
+        amount?: number | null;
+        method: 'bank_transfer' | 'other';
+        date: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Prices at order time. Later price changes never alter it.
+   */
+  snapshot: {
+    serviceId?: number | null;
+    serviceSlug?: string | null;
+    serviceTitle?: string | null;
+    baseName?: string | null;
+    basePrice?: number | null;
+    baseDays?: number | null;
+    extras?:
+      | {
+          extraId?: string | null;
+          title?: string | null;
+          price?: number | null;
+          days?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    subtotal?: number | null;
+    vatRate?: number | null;
+    vat?: number | null;
+    total: number;
+    depositPercent?: number | null;
+    depositNet?: number | null;
+    deliveryDays?: number | null;
+  };
+  payments?:
+    | {
+        kind: 'full' | 'deposit' | 'balance';
+        status: 'open' | 'pending' | 'paid' | 'failed' | 'expired';
+        amount: number;
+        refunded?: number | null;
+        checkoutSessionId?: string | null;
+        checkoutUrl?: string | null;
+        expiresAt?: string | null;
+        paymentIntentId?: string | null;
+        paidAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * From the Stripe payment page.
+   */
+  billing?: {
+    name?: string | null;
+    company?: string | null;
+    line1?: string | null;
+    line2?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    country?: string | null;
+    vatId?: string | null;
+  };
+  termsAcceptedAt?: string | null;
+  adminNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -498,6 +750,18 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stripe-events".
+ */
+export interface StripeEvent {
+  id: number;
+  eventId: string;
+  type: string;
+  processedAt: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -536,8 +800,16 @@ export interface PayloadLockedDocument {
         value: number | Customer;
       } | null)
     | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'stripe-events';
+        value: number | StripeEvent;
       } | null);
   globalSlug?: string | null;
   user:
@@ -599,6 +871,12 @@ export interface ServicesSelect<T extends boolean = true> {
   slug?: T;
   sortOrder?: T;
   title?: T;
+  heroFeatures?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
   summary?: T;
   keyPoints?:
     | T
@@ -608,6 +886,41 @@ export interface ServicesSelect<T extends boolean = true> {
       };
   image?: T;
   sections?: T | {};
+  ordering?:
+    | T
+    | {
+        mode?: T;
+        baseName?: T;
+        baseDescription?: T;
+        baseIncludes?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        basePrice?: T;
+        baseDays?: T;
+        depositPercent?: T;
+        extras?:
+          | T
+          | {
+              title?: T;
+              summary?: T;
+              price?: T;
+              days?: T;
+              active?: T;
+              description?: T;
+              includes?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              image?: T;
+              icon?: T;
+              id?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -716,6 +1029,87 @@ export interface CustomersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  number?: T;
+  status?: T;
+  paymentStatus?: T;
+  customer?: T;
+  locale?: T;
+  amountPaid?: T;
+  balanceDue?: T;
+  amountRefunded?: T;
+  balanceRequested?: T;
+  balanceRequestedAt?: T;
+  manualPayments?:
+    | T
+    | {
+        amount?: T;
+        method?: T;
+        date?: T;
+        note?: T;
+        id?: T;
+      };
+  snapshot?:
+    | T
+    | {
+        serviceId?: T;
+        serviceSlug?: T;
+        serviceTitle?: T;
+        baseName?: T;
+        basePrice?: T;
+        baseDays?: T;
+        extras?:
+          | T
+          | {
+              extraId?: T;
+              title?: T;
+              price?: T;
+              days?: T;
+              id?: T;
+            };
+        subtotal?: T;
+        vatRate?: T;
+        vat?: T;
+        total?: T;
+        depositPercent?: T;
+        depositNet?: T;
+        deliveryDays?: T;
+      };
+  payments?:
+    | T
+    | {
+        kind?: T;
+        status?: T;
+        amount?: T;
+        refunded?: T;
+        checkoutSessionId?: T;
+        checkoutUrl?: T;
+        expiresAt?: T;
+        paymentIntentId?: T;
+        paidAt?: T;
+        id?: T;
+      };
+  billing?:
+    | T
+    | {
+        name?: T;
+        company?: T;
+        line1?: T;
+        line2?: T;
+        postalCode?: T;
+        city?: T;
+        country?: T;
+        vatId?: T;
+      };
+  termsAcceptedAt?: T;
+  adminNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -738,6 +1132,17 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stripe-events_select".
+ */
+export interface StripeEventsSelect<T extends boolean = true> {
+  eventId?: T;
+  type?: T;
+  processedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1547,6 +1952,33 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Applies to every service. Prices on the website are always net.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-settings".
+ */
+export interface ShopSetting {
+  id: number;
+  /**
+   * Off hides every order button and blocks checkout. Quote links stay visible.
+   */
+  orderingEnabled?: boolean | null;
+  /**
+   * Added on top of net prices at checkout. Every customer pays the same.
+   */
+  vatRate: '0' | '19';
+  /**
+   * Shown under totals, e.g. "All prices net plus 19% VAT" or the §19 UStG note.
+   */
+  priceNote?: string | null;
+  /**
+   * Where new paid orders are announced.
+   */
+  orderNotificationEmail?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home_select".
  */
@@ -2030,6 +2462,19 @@ export interface FooterSelect<T extends boolean = true> {
         id?: T;
       };
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-settings_select".
+ */
+export interface ShopSettingsSelect<T extends boolean = true> {
+  orderingEnabled?: T;
+  vatRate?: T;
+  priceNote?: T;
+  orderNotificationEmail?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -7,7 +7,7 @@ import type { AuthMode } from './policy'
 
 export async function allowAuthRequest(
   payload: Payload,
-  mode: AuthMode | 'second-factor' | 'account-security' | 'account-profile',
+  mode: AuthMode | 'second-factor' | 'account-security' | 'account-profile' | 'checkout',
   headers: Headers,
   email?: string,
 ) {
@@ -36,16 +36,18 @@ export async function allowAuthRequest(
       sql`DELETE FROM rheino_auth.rate_limits WHERE expires_at <= now()`,
     )
 
-  if (!(await take('all', ip ? 150 : 60, 60))) return false
+  // Narrow limits first: a request already blocked for its IP or email must not use up the
+  // site-wide limit, or one client could lock every customer out.
   if (ip && !(await take(`ip:${ip}`, mode === 'login' ? 15 : 10, 300))) return false
   const limits = {
     'second-factor': [8, 300],
     'account-security': [10, 900],
     'account-profile': [20, 300],
+    checkout: [10, 900],
   } as const
   if (email && mode !== 'login') {
     const [max, seconds] = mode in limits ? limits[mode as keyof typeof limits] : [4, 900]
     if (!(await take(`email:${email}`, max, seconds))) return false
   }
-  return true
+  return take('all', ip ? 150 : 60, 60)
 }

@@ -1,7 +1,8 @@
 import { sql } from '@payloadcms/db-postgres'
-import { AuthenticationError, type CollectionConfig, type PayloadRequest } from 'payload'
+import { APIError, AuthenticationError, type CollectionConfig, type PayloadRequest } from 'payload'
 
 import { isAdmin, isAdminField, isAdminOrSelf } from '@/access'
+import { hasGrantedCustomerSession } from '@/access/customer-session'
 import { ADMIN_GROUPS } from '@/lib/cms'
 import { customerEmail } from '@/lib/customer-auth/email'
 import { verifyCustomerLogin } from '@/lib/customer-auth/mfa'
@@ -10,24 +11,13 @@ import {
   advanceCredentialEpoch,
   captureCredentialEpoch,
   grantCustomerSession,
-  hasCustomerSessionGrant,
   revokeCustomerSessions,
 } from '@/lib/customer-auth/session-grants'
 import { authDatabase } from '@/lib/customer-auth/transaction'
 import { profileFieldRules } from '@/lib/customer-auth/validation/fields'
 
-const customerRecordAccess: typeof isAdminOrSelf = async (args) => {
-  const { req } = args
-  if (req.payloadAPI !== 'local' && req.user?.collection === 'customers') {
-    if (
-      !('_sid' in req.user) ||
-      typeof req.user._sid !== 'string' ||
-      !(await hasCustomerSessionGrant(req.payload.db.drizzle, req.user.id, req.user._sid))
-    )
-      return false
-  }
-  return isAdminOrSelf(args)
-}
+const customerRecordAccess: typeof isAdminOrSelf = async (args) =>
+  (await hasGrantedCustomerSession(args.req)) ? isAdminOrSelf(args) : false
 
 /**
  * Website customer accounts. Customers log in on the website's own pages, never in /admin:
@@ -80,6 +70,22 @@ export const Customers: CollectionConfig = {
     handler: () => new Response(null, { status: 404 }),
   })),
   hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        // Orders (and the invoices behind them) must be kept for 8 years.
+        const { totalDocs } = await req.payload.count({
+          collection: 'orders',
+          where: { customer: { equals: id } },
+          overrideAccess: true,
+          req,
+        })
+        if (totalDocs)
+          throw new APIError(
+            'Customers with orders cannot be deleted. Orders must be kept for 8 years.',
+            400,
+          )
+      },
+    ],
     afterChange: [
       async ({ context, doc, previousDoc, req, operation }) => {
         const passwordChanged = context.customerPasswordChanged === true

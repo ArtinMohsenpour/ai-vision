@@ -415,6 +415,109 @@
   }
 }
 
+.serviceMap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr);
+  grid-template-rows: repeat(var(--feature-rows), minmax(4rem, 1fr));
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: clamp(15rem, 28vw, 25rem);
+  height: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stage:has(.serviceMap ~ .motion) {
+    padding-bottom: max(3.5rem, 4vw);
+  }
+}
+
+.serviceMap ~ .motion {
+  top: auto;
+  bottom: 0.5rem;
+}
+
+.serviceIdentity {
+  position: relative;
+  inset: auto;
+  translate: none;
+  width: 100%;
+  align-self: center;
+  grid-area: 1 / 2 / -1 / 3;
+}
+
+.serviceTitle {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.08em 0;
+  font-size: clamp(1.85rem, 4.6vw, 4.4rem);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.featureList {
+  display: grid;
+  grid-area: 1 / 1 / -1 / -1;
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
+}
+
+.featureNode {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-row: var(--row);
+  grid-column: var(--column);
+  place-items: center;
+  min-width: 0;
+}
+
+.featureNode .feature {
+  position: relative;
+  inset: auto;
+  translate: none;
+  z-index: 2;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
+  padding-inline: clamp(0.65rem, 1.5vw, 1.3rem);
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: none;
+  background-color: color-mix(in srgb, var(--hero-glass-solid) 69%, transparent);
+}
+
+@media (max-width: 639px) {
+  .serviceMap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, auto);
+    gap: 0.85rem clamp(1.75rem, 8vw, 3.25rem);
+    min-height: 8rem;
+  }
+  .serviceMap:has(.featureList) {
+    grid-template-rows:
+      repeat(var(--phone-feature-rows), minmax(3.5rem, 1fr))
+      minmax(5rem, auto)
+      repeat(var(--phone-feature-rows), minmax(3.5rem, 1fr));
+  }
+  .serviceIdentity {
+    grid-row: calc(var(--phone-feature-rows) + 1);
+    grid-column: 1 / -1;
+    width: min(92%, 25rem);
+    justify-self: center;
+  }
+  .serviceTitle {
+    font-size: clamp(1.9rem, 8vw, 3.5rem);
+  }
+  .featureNode {
+    grid-row: var(--phone-row);
+    grid-column: var(--phone-column);
+  }
+  .featureNode .feature {
+    justify-self: var(--phone-align);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion,
   .weather {
